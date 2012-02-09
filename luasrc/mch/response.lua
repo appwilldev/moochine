@@ -17,15 +17,6 @@ function Response:new()
     return ret
 end
 
-
-function Response:headers()
-    return ngx.header
-end
-
-function Response:set_header(key,value)
-    ngx.header[key]=value
-end
-
 function Response:write(content)
     ngx.print(content)
 end
@@ -34,4 +25,7 @@ function Response:writeln(content)
     ngx.say(content)
 end
 
+function Response:redirect(url, status)
+    ngx.redirect(url, status)
+end
 

@@ -30,18 +30,8 @@ function Request:new()
     return ret
 end
 
-
-function Request:get_headers()
-    return ngx.req.get_headers()
-end
-
-function Request:get_header(key)
-    return ngx.req.get_headers()[key]
-end
-
 function Request:read_body()
     ngx.req.read_body()
     self['post_args']=ngx.req.get_post_args()
 end
-
 
