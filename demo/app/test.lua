@@ -7,8 +7,9 @@
 
 module("test",package.seeall)
 
-function hello(name)
-   ngx.say('Hello, ' .. name)
+function hello(req,resp,name)
+   resp:write('Agent: ' .. req:get_header('User-Agent'))
+   resp:write('Hello, ' .. name)
 end
 
    

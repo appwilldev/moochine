@@ -4,12 +4,15 @@
 -- author : KDr2
 --
 
+
 function setup_app()
    local app_path = ngx.var.MOOCHINE_APP
    local mch_home = ngx.var.MOOCHINE_HOME
    _G['MOOCHINE_APP']=string.match(app_path,'^.*/([^/]+)/?$')
    package.path = mch_home .. '/luasrc/?.lua;' .. package.path
    package.path = app_path .. '/app/?.lua;' .. package.path
+   require("mch.request")
+   require("mch.response")
    require("routing")
 end
 
@@ -27,7 +30,7 @@ function content()
    for k,v in pairs(route_map) do
       local args=string.match(uri, k)
       if args then
-         v(args)
+         v(request.Request:new(),response.Response:new(),args)
          break
       end
    end
