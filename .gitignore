@@ -1,6 +1,7 @@
 
 #demo logs
 demo/logs
+demo/p-*
 
 #temp files
 temp
