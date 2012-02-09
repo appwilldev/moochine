@@ -29,7 +29,8 @@ function Response:write(content)
    ngx.print(content)
 end
 
-
-
+function Response:writeln(content)
+    ngx.say(content)
+end
 
 
