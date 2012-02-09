@@ -10,6 +10,7 @@ Response={}
 
 function Response:new()
    local ret={}
+   ret['headers']=ngx.header
    setmetatable(ret,self)
    self.__index=self
    return ret
