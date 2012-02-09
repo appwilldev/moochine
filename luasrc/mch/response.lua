@@ -26,7 +26,7 @@ function Response:set_header(key,value)
 end
 
 function Response:write(content)
-   ngx.say(content)
+   ngx.print(content)
 end
 
 
