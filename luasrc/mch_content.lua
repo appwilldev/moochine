@@ -13,6 +13,9 @@ function setup_app()
    package.path = app_path .. '/app/?.lua;' .. package.path
    require("mch.request")
    require("mch.response")
+   _G['MOOCHINE_MODULES']={}
+   _G['MOOCHINE_MODULES']['request']=request
+   _G['MOOCHINE_MODULES']['response']=response
    require("routing")
 end
 
@@ -30,6 +33,8 @@ function content()
    for k,v in pairs(route_map) do
       local args=string.match(uri, k)
       if args then
+         local request=_G['MOOCHINE_MODULES']['request']
+         local response=_G['MOOCHINE_MODULES']['response']
          v(request.Request:new(),response.Response:new(),args)
          break
       end
