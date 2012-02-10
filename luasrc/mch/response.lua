@@ -33,6 +33,24 @@ function Response:redirect(url, status)
     ngx.redirect(url, status)
 end
 
+function Response:set_cookie(key, value, duration, path)
+    if not key or key=="" or not value then
+        return
+    end
+
+    if not duration or duration<=0 then
+        duration=86400
+    end
+
+    if not path or path=="" then
+        path = "/"
+    end
+
+    local expiretime=ngx.time()+duration
+    expiretime = ngx.cookie_time(expiretime)
+    ngx.header["Set-Cookie"]={key.."="..value.."; expires="..expiretime.."; path="..path}
+end
+
 --[[
 LTP Template Support
 --]]
