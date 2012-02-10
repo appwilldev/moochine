@@ -8,14 +8,9 @@
 function setup_app()
     local app_path = ngx.var.MOOCHINE_APP
     local mch_home = ngx.var.MOOCHINE_HOME
-    _G['MOOCHINE_APP']=string.match(app_path,'^.*/([^/]+)/?$')
     package.path = mch_home .. '/luasrc/?.lua;' .. package.path
-    package.path = app_path .. '/app/?.lua;' .. package.path
-    require("mch.request")
-    require("mch.response")
-    _G['MOOCHINE_MODULES']={}
-    _G['MOOCHINE_MODULES']['request']=request
-    _G['MOOCHINE_MODULES']['response']=response
+    require("mch.mchutil")
+    mchutil.setup_app_env(mch_home,app_path,_G)
     require("routing")
 end
 

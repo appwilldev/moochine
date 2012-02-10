@@ -24,3 +24,9 @@ function hello(req, resp, name)
     end 
 end
 
+
+function ltp(req,resp,...)
+    resp:ltp('ltp.html',{v=123})
+end
+
+
