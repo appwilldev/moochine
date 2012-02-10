@@ -54,9 +54,7 @@ function Response:ltp(template,data)
     local mt={__index=_G}
     setmetatable(data,mt)
     ltp.execute_template(rfun, data, output)
-    for _,v in pairs(output) do
-        ngx.say(v)
-    end
+    ngx.say(output)
 end
 
 
