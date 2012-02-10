@@ -33,14 +33,30 @@ function Response:redirect(url, status)
     ngx.redirect(url, status)
 end
 
+--[[
+LTP Template Support
+--]]
+
+ltp_templates_cache={}
+
+function ltp_function(template)
+    ret=ltp_templates_cache[template]
+    if ret then return ret end
+    local tdata=mchutil.read_all(MOOCHINE_APP_PATH .. "/templates/" .. template)
+    local rfun = ltp.load_template(tdata, '<?lua','?>')
+    ltp_templates_cache[template]=rfun
+    return rfun
+end
 
 function Response:ltp(template,data)
-    local tdata=mchutil.read_all(MOOCHINE_APP_PATH .. "/templates/" .. template)
-    local mt={}
-    mt.__index=_G
+    local rfun=ltp_function(template)
+    local output = {}
+    local mt={__index=_G}
     setmetatable(data,mt)
-    local page=ltp.render_template(tdata,'<?lua','?>',data)
-    ngx.say(page)
+    ltp.execute_template(rfun, data, output)
+    for _,v in pairs(output) do
+        ngx.say(v)
+    end
 end
 
 
