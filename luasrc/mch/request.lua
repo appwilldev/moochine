@@ -24,7 +24,8 @@ function Request:new()
         remote_user=ngx.var.remote_user,
         content_type=ngx.var.content_type,
         content_length=ngx.var.content_length,
-        uri_args=ngx.req.get_uri_args()
+        uri_args=ngx.req.get_uri_args(),
+        socket=ngx.req.socket
     }
 
     setmetatable(ret,self)
