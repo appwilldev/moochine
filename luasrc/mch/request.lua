@@ -22,6 +22,7 @@ function Request:new()
         remote_addr=ngx.var.remote_addr,
         remote_port=ngx.var.remote_port,
         remote_user=ngx.var.remote_user,
+        remote_passwd=ngx.var.remote_passwd,
         content_type=ngx.var.content_type,
         content_length=ngx.var.content_length,
         uri_args=ngx.req.get_uri_args(),
