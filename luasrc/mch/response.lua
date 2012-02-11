@@ -53,7 +53,9 @@ function Response:set_cookie(key, value, decrypt, duration, path)
 
     local expiretime=ngx.time()+duration
     expiretime = ngx.cookie_time(expiretime)
-    ngx.header["Set-Cookie"]={key.."="..value.."; expires="..expiretime.."; path="..path}
+    ngx.header["Set-Cookie"]={
+        table.concat({key, "=", value, "; expires=", expiretime, "; path=", path})
+    }
 end
 
 --[[
