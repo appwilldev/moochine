@@ -49,9 +49,17 @@ function Request:get_cookie(key, decrypt)
     return value
 end
 
+function Request:rewrite(uri, jump)
+    return ngx.req.set_uri(uri, jump)
+end
+
+function Request:set_uri_args(args)
+    return ngx.req.set_uri_args(args)
+end
 
 -- to prevent use of casual module global variables
 getmetatable(request).__newindex = function (table, key, val)
     error('attempt to write to undeclared variable "' .. key .. '": '
             .. debug.traceback())
 end
+
