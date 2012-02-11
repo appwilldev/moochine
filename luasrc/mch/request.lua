@@ -37,7 +37,20 @@ function Request:read_body()
     self['post_args']=ngx.req.get_post_args()
 end
 
-function Request:get_cookie(key)
-    return ngx.var['cookie_'..key]
+function Request:get_cookie(key, decrypt)
+    local value = ngx.var['cookie_'..key]
+
+    if value and value~="" and decrypt==true then
+        value=ndk.set_var.set_decode_base64(value)
+        value=ndk.set_var.set_decrypt_session(value)
+    end
+
+    return value
 end
 
+
+-- to prevent use of casual module global variables
+getmetatable(request).__newindex = function (table, key, val)
+    error('attempt to write to undeclared variable "' .. key .. '": '
+            .. debug.traceback())
+end
