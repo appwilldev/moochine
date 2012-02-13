@@ -3,7 +3,8 @@
 MOOCHINE
 =================
 
-A (very) simple and lightweight web framework based on ngx-openresty.
+A (very) simple and lightweight web framework based on
+`ngx-openresty <http://openresty.org/>`_.
 
 
 How to use
@@ -18,7 +19,7 @@ How to use
     MOOCHINE_APP var)
     
   * app/routing.lua (url map using lua's `string.match`)
-  * templats/* (ltp templates)
+  * templates/* (`ltp templates <http://www.savarese.com/software/ltp/>`_)
 
 Roadmap
 -----------------
