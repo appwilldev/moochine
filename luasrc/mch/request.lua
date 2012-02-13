@@ -4,7 +4,7 @@
 -- author : KDr2
 --
 
-module('request',package.seeall)
+module('mch.request',package.seeall)
 
 Request={}
 
@@ -59,7 +59,7 @@ function Request:set_uri_args(args)
 end
 
 -- to prevent use of casual module global variables
-getmetatable(request).__newindex = function (table, key, val)
+getmetatable(mch.request).__newindex = function (table, key, val)
     error('attempt to write to undeclared variable "' .. key .. '": '
             .. debug.traceback())
 end

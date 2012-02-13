@@ -6,7 +6,7 @@
 
 
 require 'mch.router'
-router.setup('demo')
+mch.router.setup('demo')
 
 -----------------------------------------------
 

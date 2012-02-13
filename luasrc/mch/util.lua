@@ -4,7 +4,7 @@
 -- author : KDr2
 --
 
-module('mchutil',package.seeall)
+module('mch.util',package.seeall)
 
 function read_all(filename)
     local file = io.open(filename, "r")
@@ -22,8 +22,8 @@ function setup_app_env(mch_home,app_path,global)
     global['MOOCHINE_APP_PATH']=app_path
     package.path = mch_home .. '/lualibs/?.lua;' .. package.path
     package.path = app_path .. '/app/?.lua;' .. package.path
-    require("mch.request")
-    require("mch.response")
+    local request=require("mch.request")
+    local response=require("mch.response")
     global['MOOCHINE_MODULES']={}
     global['MOOCHINE_MODULES']['request']=request
     global['MOOCHINE_MODULES']['response']=response

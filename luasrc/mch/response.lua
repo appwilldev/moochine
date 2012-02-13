@@ -4,9 +4,9 @@
 -- author : KDr2
 --
 
-module('response',package.seeall)
+module('mch.response',package.seeall)
 
-require('mch.mchutil')
+mchutil=require('mch.util')
 
 ltp=require("ltp.template")
 

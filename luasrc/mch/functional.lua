@@ -5,7 +5,7 @@
 --
 
 
-module('functional',package.seeall)
+module('mch.functional',package.seeall)
 
 function _curry(func, arg)
     local curry_args= arg

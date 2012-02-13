@@ -9,7 +9,7 @@ function setup_app()
     local app_path = ngx.var.MOOCHINE_APP
     local mch_home = ngx.var.MOOCHINE_HOME
     package.path = mch_home .. '/luasrc/?.lua;' .. package.path
-    require("mch.mchutil")
+    local mchutil=require("mch.util")
     mchutil.setup_app_env(mch_home,app_path,_G)
     require("routing")
 end

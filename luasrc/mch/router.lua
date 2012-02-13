@@ -4,10 +4,10 @@
 -- author : KDr2
 --
 
+
+module('mch.router',package.seeall)
+
 require 'mch.functional'
-
-module('router',package.seeall)
-
 
 function map(route_table, uri, func_name)
     local mod,fn = string.match(func_name,'^(.+)%.([^.]+)$')
@@ -23,7 +23,7 @@ function setup(app_name)
     end
     local route_map={}
     _G[app_name]['route_map']=route_map
-    _G[app_name]['map']=functional.curry(map,route_map)
+    _G[app_name]['map']=mch.functional.curry(map,route_map)
     setfenv(2,_G[app_name])
 end
 
