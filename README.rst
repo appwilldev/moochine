@@ -18,8 +18,8 @@ How to use
   * demo/conf/nginx.conf (the nginx config file, you need change the MOOCHINE_HOME and
     MOOCHINE_APP var)
     
-  * app/routing.lua (url map using lua's `string.match`)
-  * templates/* (`ltp templates <http://www.savarese.com/software/ltp/>`_)
+  * demo/app/routing.lua (url map using lua's `string.match`)
+  * demo/templates/* (`ltp templates <http://www.savarese.com/software/ltp/>`_)
 
 Roadmap
 -----------------
