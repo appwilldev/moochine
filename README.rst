@@ -20,4 +20,10 @@ How to use
   * app/routing.lua (url map using lua's `string.match`)
   * templats/* (ltp templates)
 
+Roadmap
+-----------------
+
+`Moochine` is simple now, so there's no `Roadmap` for it at the moment, but any feature
+request is welcome, just tell us, or make it out yourself.
+  
   
