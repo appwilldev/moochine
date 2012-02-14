@@ -1,4 +1,4 @@
-
+.. MOCHINE README
 
 MOOCHINE
 =================
@@ -28,3 +28,9 @@ Roadmap
 request is welcome, just tell us, or make it out yourself.
   
   
+License
+------------------
+This software is distributed under Apache License Version 2.0, see file ``LICENSE`` or
+http://www.apache.org/licenses/LICENSE-2.0
+
+
