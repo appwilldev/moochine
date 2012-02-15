@@ -28,7 +28,8 @@ Response={ltp=ltp}
 
 function Response:new()
     local ret={
-        headers=ngx.header
+        headers=ngx.header,
+        _output={}
     }
     setmetatable(ret,self)
     self.__index=self
@@ -36,11 +37,12 @@ function Response:new()
 end
 
 function Response:write(content)
-    ngx.print(content)
+    table.insert(self._output,content)
 end
 
 function Response:writeln(content)
-    ngx.say(content)
+    table.insert(self._output,content)
+    table.insert(self._output,"\r\n")
 end
 
 function Response:redirect(url, status)

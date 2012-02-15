@@ -45,7 +45,13 @@ function content()
         if args then
             local request=_G['MOOCHINE_MODULES']['request']
             local response=_G['MOOCHINE_MODULES']['response']
-            v(request.Request:new(),response.Response:new(),args)
+            if type(v)=="function" then
+                v(request.Request:new(),response.Response:new(),args)
+            elseif type(v)=="table" then
+                v:_handler(request.Request:new(),response.Response:new(),args)
+            else
+                ngx.exit(500)
+            end
             break
         end
     end
