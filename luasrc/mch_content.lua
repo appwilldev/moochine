@@ -46,7 +46,9 @@ function content()
             local request=_G['MOOCHINE_MODULES']['request']
             local response=_G['MOOCHINE_MODULES']['response']
             if type(v)=="function" then
-                v(request.Request:new(),response.Response:new(),args)
+                local response=response.Response:new()
+                v(request.Request:new(),response,args)
+                ngx.print(response._output)
             elseif type(v)=="table" then
                 v:_handler(request.Request:new(),response.Response:new(),args)
             else
