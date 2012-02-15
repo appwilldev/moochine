@@ -47,7 +47,7 @@ function Response:redirect(url, status)
     ngx.redirect(url, status)
 end
 
-function Response:set_cookie(key, value, decrypt, duration, path)
+function Response:set_cookie(key, value, encrypt, duration, path)
     if not key or key=="" or not value then
         return
     end
@@ -60,7 +60,7 @@ function Response:set_cookie(key, value, decrypt, duration, path)
         path = "/"
     end
 
-    if value and value~="" and decrypt==true then
+    if value and value~="" and encrypt==true then
         value=ndk.set_var.set_encrypt_session(value)
         value=ndk.set_var.set_encode_base64(value)
     end
