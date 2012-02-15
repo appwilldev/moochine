@@ -21,18 +21,15 @@ function ctller_v2:before(req, resp)
 end
 
 function ctller_v2:get(req, resp, name)
-    -- resp:writeln('Host: ' .. req.host)
-    -- resp:writeln('Hello, ' .. ngx.unescape_uri(name))
-    -- resp:writeln('name, ' .. req.args['name'])
-    resp.headers['Content-Type'] = 'application/json'
-    resp:write(JSON.encode(req.uri_args)) 
+    resp.headers['Content-Type'] = 'text/plain'
+    resp:writeln("Hello, " .. name .. ". I got you from a GET!")
 end
 
 
 function ctller_v2:post(req, resp, name)
-    -- resp:writeln('POST to Host: ' .. req.host)
     req:read_body()
     resp.headers['Content-Type'] = 'application/json'
+    resp:writeln("Hello, " .. name .. ". I got you from a POST!")
     resp:writeln(JSON.encode(req.post_args))
 end
 

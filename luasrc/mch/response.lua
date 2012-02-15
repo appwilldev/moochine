@@ -95,7 +95,7 @@ function Response:ltp(template,data)
     local mt={__index=_G}
     setmetatable(data,mt)
     ltp.execute_template(rfun, data, output)
-    ngx.print(output)
+    table.insert(self._output,output)
 end
 
 
