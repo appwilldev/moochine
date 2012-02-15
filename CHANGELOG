@@ -6,6 +6,7 @@ MOCHINE CHANGLOG
 develop
 ------------------------------------------------------------
 
+* multi ``Set-Cookie`` headers via ``Response:set_cookie``
 * map url to mch.controller
 * before/after filter
 

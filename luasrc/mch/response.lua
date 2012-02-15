@@ -29,6 +29,7 @@ Response={ltp=ltp}
 function Response:new()
     local ret={
         headers=ngx.header,
+        _cookies={},
         _output={}
     }
     setmetatable(ret,self)
@@ -49,7 +50,7 @@ function Response:redirect(url, status)
     ngx.redirect(url, status)
 end
 
-function Response:set_cookie(key, value, encrypt, duration, path)
+function Response:_set_cookie(key, value, encrypt, duration, path)
     if not key or key=="" or not value then
         return
     end
@@ -69,9 +70,14 @@ function Response:set_cookie(key, value, encrypt, duration, path)
 
     local expiretime=ngx.time()+duration
     expiretime = ngx.cookie_time(expiretime)
-    ngx.header["Set-Cookie"]={
-        table.concat({key, "=", value, "; expires=", expiretime, "; path=", path})
-    }
+    return table.concat({key, "=", value, "; expires=", expiretime, "; path=", path})
+end
+
+function Response:set_cookie(key, value, encrypt, duration, path)
+    if not value then self._cookies[key]=nil end
+    local cookie=self:_set_cookie(key, value, encrypt, duration, path)
+    self._cookies[key]=cookie
+    ngx.header["Set-Cookie"]=self._cookies
 end
 
 --[[
