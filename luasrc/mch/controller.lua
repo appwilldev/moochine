@@ -117,7 +117,7 @@ end
 function Controller:_handler(request,response,...)
     local method=string.lower(ngx.var.request_method)
     local ctller=self:new()
-    local handler=ctller[method]
+    local handler=ctller[method] or ctller['dummy_handler']
 
     for i=1,1 do
         if type(handler)=="function" then
