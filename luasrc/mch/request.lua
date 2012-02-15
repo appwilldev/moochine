@@ -33,6 +33,7 @@ function Request:new()
         filename=ngx.var.request_filename,
         query_string=ngx.var.query_string,
         headers=ngx.req.get_headers(),
+        user_agent=ngx.var.http_user_agent,
         remote_addr=ngx.var.remote_addr,
         remote_port=ngx.var.remote_port,
         remote_user=ngx.var.remote_user,

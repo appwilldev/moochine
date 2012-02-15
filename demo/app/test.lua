@@ -13,7 +13,7 @@ function hello(req, resp, name)
     if req.method=='GET' then
         -- resp:writeln('Host: ' .. req.host)
         -- resp:writeln('Hello, ' .. ngx.unescape_uri(name))
-        -- resp:writeln('name, ' .. req.args['name'])
+        -- resp:writeln('name, ' .. req.uri_args['name'])
         resp.headers['Content-Type'] = 'application/json'
         resp:write(JSON.encode(req.uri_args))
     elseif req.method=='POST' then
