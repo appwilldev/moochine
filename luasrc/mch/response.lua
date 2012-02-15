@@ -51,6 +51,9 @@ function Response:redirect(url, status)
 end
 
 function Response:_set_cookie(key, value, encrypt, duration, path)
+
+    if not value then return nil end
+    
     if not key or key=="" or not value then
         return
     end
@@ -74,7 +77,6 @@ function Response:_set_cookie(key, value, encrypt, duration, path)
 end
 
 function Response:set_cookie(key, value, encrypt, duration, path)
-    if not value then self._cookies[key]=nil end
     local cookie=self:_set_cookie(key, value, encrypt, duration, path)
     self._cookies[key]=cookie
     ngx.header["Set-Cookie"]=self._cookies
