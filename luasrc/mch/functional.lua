@@ -43,7 +43,7 @@ function curry(func, ...)
 end
 
 function map(func,tab)
-    retv={}
+    local retv={}
     for k,v in pairs(tab) do
         local rk,rv=func(k,v)
         if rk then
@@ -63,22 +63,29 @@ function any(func,tab)
 end
     
 function filter(func,tab)
-    retv={}
+    local retv={}
     for k,v in pairs(tab) do
         if func(k,v) then retv[k]=v end
     end
     return retv
 end
 
+function fold(func,acc,tab)
+    local ret=acc
+    for k,v in pairs(tab) do
+        ret=func(ret,k,v)
+    end
+    return ret
+end
+
+
+
 --[[
 -- common lua functions based on functional tools above
 --]]
 
-function table_values()
-    local getv=function(_,v)return nil,v end
-    return function(tab) return map(getv,tab) end
-end
-table_values=table_values()
-
+table_keys=curry(map,function(k,_)return nil,k end)
+table_values=curry(map,function(_,v)return nil,v end)
+table2array=table_values
 
 
