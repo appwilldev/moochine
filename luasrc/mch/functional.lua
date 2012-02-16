@@ -41,5 +41,10 @@ function curry(func, ...)
 end
 
 
+function table_values(tab)
+    retv={}
+    for _,v in pairs(tab) do table.insert(retv,v) end
+    return retv
+end
 
 

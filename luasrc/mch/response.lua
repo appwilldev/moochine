@@ -21,7 +21,7 @@
 module('mch.response',package.seeall)
 
 mchutil=require('mch.util')
-
+functional=require('mch.functional')
 ltp=require("ltp.template")
 
 Response={ltp=ltp}
@@ -79,7 +79,7 @@ end
 function Response:set_cookie(key, value, encrypt, duration, path)
     local cookie=self:_set_cookie(key, value, encrypt, duration, path)
     self._cookies[key]=cookie
-    ngx.header["Set-Cookie"]=self._cookies
+    ngx.header["Set-Cookie"]=mch.functional.table_values(self._cookies)
 end
 
 --[[
