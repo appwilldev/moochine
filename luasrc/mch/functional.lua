@@ -21,6 +21,10 @@
 
 module('mch.functional',package.seeall)
 
+--[[
+-- common functional tools
+--]]
+
 function _curry(func, arg)
     local curry_args= arg
     function inner(...)
@@ -28,8 +32,6 @@ function _curry(func, arg)
     end
     return inner
 end
-
-
 
 function curry(func, ...)
     local inner=func
@@ -40,11 +42,43 @@ function curry(func, ...)
     return inner
 end
 
-
-function table_values(tab)
+function map(func,tab)
     retv={}
-    for _,v in pairs(tab) do table.insert(retv,v) end
+    for k,v in pairs(tab) do
+        local rk,rv=func(k,v)
+        if rk then
+            retv[rk]=rv
+        else
+            table.insert(retv,rv)
+        end
+    end
     return retv
 end
+
+function any(func,tab)
+    for k,v in pairs(tab) do
+        if func(k,v) then return true end
+    end
+    return false
+end
+    
+function filter(func,tab)
+    retv={}
+    for k,v in pairs(tab) do
+        if func(k,v) then retv[k]=v end
+    end
+    return retv
+end
+
+--[[
+-- common lua functions based on functional tools above
+--]]
+
+function table_values()
+    local getv=function(_,v)return nil,v end
+    return function(tab) return map(getv,tab) end
+end
+table_values=table_values()
+
 
 
