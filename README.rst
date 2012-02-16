@@ -6,6 +6,9 @@ MOOCHINE
 A (very) simple and lightweight web framework based on
 `ngx-openresty <http://openresty.org/>`_.
 
+Download
+------------------
+https://github.com/appwilldev/moochine/zipball/v0.2
 
 How to use
 -----------------
