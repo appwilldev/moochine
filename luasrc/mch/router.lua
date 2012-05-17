@@ -35,9 +35,11 @@ function setup(app_name)
     if not _G[app_name] then
         _G[app_name]={}
     end
-    local route_map={}
-    _G[app_name]['route_map']=route_map
-    _G[app_name]['map']=mch.functional.curry(map,route_map)
+    if not _G[app_name]['route_map'] then
+        local route_map={}
+        _G[app_name]['route_map']=route_map
+    end
+    _G[app_name]['map']=mch.functional.curry(map,_G[app_name]['route_map'])
     setfenv(2,_G[app_name])
 end
 
