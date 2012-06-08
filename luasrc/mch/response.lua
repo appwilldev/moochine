@@ -92,6 +92,9 @@ function ltp_function(template)
     ret=ltp_templates_cache[template]
     if ret then return ret end
     local tdata=mchutil.read_all(MOOCHINE_APP_PATH .. "/templates/" .. template)
+    if not tdata then
+        tdata=mchutil.read_all(MOOCHINE_EXTRA_APP_PATH .. "/templates/" .. template)
+    end
     local rfun = ltp.load_template(tdata, '<?lua','?>')
     ltp_templates_cache[template]=rfun
     return rfun

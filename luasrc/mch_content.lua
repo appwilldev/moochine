@@ -29,6 +29,7 @@ function setup_app()
     mchutil.setup_app_env(mch_home,app_path,_G)
     require("routing")
     if app_extra then
+        _G['MOOCHINE_EXTRA_APP_PATH']=app_extra
         package.path = app_extra .. '/app/?.lua;' .. package.path
         require("extra_routing")
     end
