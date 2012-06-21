@@ -23,6 +23,13 @@ module('mch.router',package.seeall)
 
 require 'mch.functional'
 
+local global=nil
+
+function set_global(t)
+    global=t
+    return t
+end
+
 function map(route_table, uri, func_name)
     local mod,fn = string.match(func_name,'^(.+)%.([^.]+)$')
     mod=require(mod)
@@ -31,16 +38,17 @@ end
 
 
 function setup(app_name)
+    if global==nil then global=_G end
     app_name='MOOCHINE_APP_' .. app_name
-    if not _G[app_name] then
-        _G[app_name]={}
+    if not global[app_name] then
+        global[app_name]={}
     end
-    if not _G[app_name]['route_map'] then
+    if not global[app_name]['route_map'] then
         local route_map={}
-        _G[app_name]['route_map']=route_map
+        global[app_name]['route_map']=route_map
     end
-    _G[app_name]['map']=mch.functional.curry(map,_G[app_name]['route_map'])
-    setfenv(2,_G[app_name])
+    global[app_name]['map']=mch.functional.curry(map,global[app_name]['route_map'])
+    setfenv(2,global[app_name])
 end
 
 
