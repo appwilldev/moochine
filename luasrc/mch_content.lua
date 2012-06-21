@@ -38,11 +38,16 @@ function setup_app()
 end
 
 function content()
-    local mchrouter=require("mch.router")
-    local global=mchrouter.get_global()
+    local global=_G
     if not global['MOOCHINE_APP'] then
         setup_app()
+        local mchrouter=require("mch.router")
+        global=mchrouter.get_global()
+    else
+        local mchrouter=require("mch.router")
+        global=mchrouter.get_global()
     end
+    
     if not global['MOOCHINE_APP'] then
         ngx.say('Can not setup MOOCHINE APP')
         ngx.exit(501)
