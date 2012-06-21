@@ -30,6 +30,10 @@ function set_global(t)
     return t
 end
 
+function get_global()
+    return global
+end
+
 function map(route_table, uri, func_name)
     local mod,fn = string.match(func_name,'^(.+)%.([^.]+)$')
     mod=require(mod)

@@ -38,21 +38,23 @@ function setup_app()
 end
 
 function content()
-    if not _G['MOOCHINE_APP'] then
+    local mchrouter=require("mch.router")
+    local global=mchrouter.get_global()
+    if not global['MOOCHINE_APP'] then
         setup_app()
     end
-    if not _G['MOOCHINE_APP'] then
+    if not global['MOOCHINE_APP'] then
         ngx.say('Can not setup MOOCHINE APP')
         ngx.exit(501)
     end
     local uri=ngx.var.REQUEST_URI
-    local app_env_key='MOOCHINE_APP_' .. _G['MOOCHINE_APP']
-    local route_map=_G[app_env_key]['route_map']
+    local app_env_key='MOOCHINE_APP_' .. global['MOOCHINE_APP']
+    local route_map=global[app_env_key]['route_map']
     for k,v in pairs(route_map) do
         local args=string.match(uri, k)
         if args then
-            local request=_G['MOOCHINE_MODULES']['request']
-            local response=_G['MOOCHINE_MODULES']['response']
+            local request=global['MOOCHINE_MODULES']['request']
+            local response=global['MOOCHINE_MODULES']['response']
             if type(v)=="function" then
                 local response=response.Response:new()
                 v(request.Request:new(),response,args)
