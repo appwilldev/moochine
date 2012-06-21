@@ -18,48 +18,52 @@
 --
 --
 
+mch_vars=nil
 
+function is_inited()
+    local o_G=rawget(getmetatable(_G),"__index")
+    return o_G['moochine_inited']
+end
 
 function setup_app()
     local app_path = ngx.var.MOOCHINE_APP
     local mch_home = ngx.var.MOOCHINE_HOME
     local app_extra= ngx.var.MOOCHINE_APP_EXTRA
     package.path = mch_home .. '/luasrc/?.lua;' .. package.path
-    local mchrouter=require("mch.router")
-    mchrouter.set_global(_G)
+    mch_vars=require("mch.vars")
     local mchutil=require("mch.util")
-    mchutil.setup_app_env(mch_home,app_path,_G)
+    mchutil.setup_app_env(mch_home,app_path,mch_vars.vars())
     require("routing")
     if app_extra then
-        _G['MOOCHINE_EXTRA_APP_PATH']=app_extra
+        mch_vars.set('MOOCHINE_EXTRA_APP_PATH',app_extra)
         package.path = app_extra .. '/app/?.lua;' .. package.path
         require("extra_routing")
     end
+
+    local o_G=rawget(getmetatable(_G),"__index")
+    o_G['moochine_inited']=true
+    
 end
 
 function content()
-    local global=_G
-    if not global['MOOCHINE_APP'] then
+    if not is_inited() then
         setup_app()
-        local mchrouter=require("mch.router")
-        global=mchrouter.get_global()
     else
-        local mchrouter=require("mch.router")
-        global=mchrouter.get_global()
+        mch_vars=require("mch.vars")
     end
     
-    if not global['MOOCHINE_APP'] then
+    if not is_inited() then
         ngx.say('Can not setup MOOCHINE APP')
         ngx.exit(501)
     end
     local uri=ngx.var.REQUEST_URI
-    local app_env_key='MOOCHINE_APP_' .. global['MOOCHINE_APP']
-    local route_map=global[app_env_key]['route_map']
+    local app_env_key='MOOCHINE_APP_' .. mch_vars.get('MOOCHINE_APP')
+    local route_map=mch_vars.get(app_env_key)['route_map']
     for k,v in pairs(route_map) do
         local args=string.match(uri, k)
         if args then
-            local request=global['MOOCHINE_MODULES']['request']
-            local response=global['MOOCHINE_MODULES']['response']
+            local request=mch_vars.get('MOOCHINE_MODULES')['request']
+            local response=mch_vars.get('MOOCHINE_MODULES')['response']
             if type(v)=="function" then
                 local response=response.Response:new()
                 v(request.Request:new(),response,args)
