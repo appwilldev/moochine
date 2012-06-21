@@ -20,9 +20,17 @@
 
 mch_vars=nil
 
-function is_inited()
-    local o_G=rawget(getmetatable(_G),"__index")
-    return o_G['moochine_inited']
+function is_inited(init)
+    local r_G=_G
+    local mt=getmetatable(_G)
+    if mt then
+        r_G=rawget(mt,"__index")
+    end
+    if init == nil then
+        return r_G['moochine_inited']
+    else
+        r_G['moochine_inited']=init
+    end
 end
 
 function setup_app()
@@ -40,8 +48,7 @@ function setup_app()
         require("extra_routing")
     end
 
-    local o_G=rawget(getmetatable(_G),"__index")
-    o_G['moochine_inited']=true
+    is_inited(true)
     
 end
 
