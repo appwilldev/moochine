@@ -20,9 +20,12 @@
 
 module('mch.response',package.seeall)
 
-mchutil=require('mch.util')
-functional=require('mch.functional')
-ltp=require("ltp.template")
+local mchutil=require('mch.util')
+local functional=require('mch.functional')
+local ltp=require("ltp.template")
+
+local MOOCHINE_APP_PATH = ngx.var.MOOCHINE_APP
+local MOOCHINE_EXTRA_APP_PATH = ngx.var.MOOCHINE_APP_EXTRA
 
 Response={ltp=ltp}
 
