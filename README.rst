@@ -8,7 +8,7 @@ A (very) simple and lightweight web framework based on
 
 Download
 ------------------
-https://github.com/appwilldev/moochine/zipball/v0.2
+git clone git://github.com/appwilldev/moochine.git
 
 How to use
 -----------------
@@ -23,6 +23,13 @@ How to use
     
   * demo/app/routing.lua (url map using lua's ``string.match``)
   * demo/templates/* (`ltp templates <http://www.savarese.com/software/ltp/>`_)
+
+
+Demo
+-----------------
+
+A complete Demo
+https://github.com/appwilldev/moochine-demo
 
 Roadmap
 -----------------

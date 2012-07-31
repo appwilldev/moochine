@@ -20,9 +20,15 @@
 
 module('mch.response',package.seeall)
 
-mchutil=require('mch.util')
-functional=require('mch.functional')
-ltp=require("ltp.template")
+local mchutil=require('mch.util')
+local functional=require('mch.functional')
+local ltp=require("ltp.template")
+
+local table_insert = table.insert
+local table_concat = table.concat
+
+local MOOCHINE_APP_PATH = ngx.var.MOOCHINE_APP
+local MOOCHINE_EXTRA_APP_PATH = ngx.var.MOOCHINE_APP_EXTRA
 
 Response={ltp=ltp}
 
@@ -38,12 +44,12 @@ function Response:new()
 end
 
 function Response:write(content)
-    table.insert(self._output,content)
+    table_insert(self._output,content)
 end
 
 function Response:writeln(content)
-    table.insert(self._output,content)
-    table.insert(self._output,"\r\n")
+    table_insert(self._output,content)
+    table_insert(self._output,"\r\n")
 end
 
 function Response:redirect(url, status)
@@ -73,7 +79,7 @@ function Response:_set_cookie(key, value, encrypt, duration, path)
 
     local expiretime=ngx.time()+duration
     expiretime = ngx.cookie_time(expiretime)
-    return table.concat({key, "=", value, "; expires=", expiretime, "; path=", path})
+    return table_concat({key, "=", value, "; expires=", expiretime, "; path=", path})
 end
 
 function Response:set_cookie(key, value, encrypt, duration, path)
@@ -113,7 +119,7 @@ function Response:ltp(template,data)
     local mt={__index=_G}
     setmetatable(data,mt)
     ltp.execute_template(rfun, data, output)
-    table.insert(self._output,output)
+    table_insert(self._output,output)
 end
 
 
