@@ -53,13 +53,13 @@ function setup_app()
         for k,t in pairs(config.subapps) do
             local subpath=t.path
             package.path = subpath .. '/app/?.lua;' .. package.path
-            dofile(subpath .. "/app/routing.lua")
+            dofile(subpath .. "/routing.lua")
         end
     end
     mch_vars.set(app_name,"APP_CONFIG",config)
 
     -- load the main-app's routing
-    dofile(app_path .. "/app/routing.lua")
+    dofile(app_path .. "/routing.lua")
     -- merge routings
     mchrouter=require("mch.router")
     mchrouter.merge_routings(app_name,config.subapps or {})
