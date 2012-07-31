@@ -5,7 +5,7 @@
 --
 
 
-module("test",package.seeall)
+module("d1_test",package.seeall)
 
 local JSON = require("cjson")
 
@@ -26,7 +26,7 @@ end
 
 
 function ltp(req,resp,...)
-    resp:ltp('ltp.html',{v=123})
+    resp:ltp('d1_ltp.html',{v=111})
 end
 
 

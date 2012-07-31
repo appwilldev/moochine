@@ -104,7 +104,7 @@ function ltp_function(template)
         tdata=(function(appname)
                    subapps=mchvars.get(appname,"APP_CONFIG").subapps or {}
                    for k,v in pairs(subapps) do
-                       d=mchutil.read_all(k.path .. "/templates/" .. template)
+                       d=mchutil.read_all(v.path .. "/templates/" .. template)
                        if d then return d end
                    end
                end)(ngx.var.MOOCHINE_APP_NAME)

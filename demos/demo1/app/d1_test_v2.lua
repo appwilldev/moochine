@@ -5,7 +5,7 @@
 --
 
 
-module("test_v2",package.seeall)
+module("d1_test_v2",package.seeall)
 
 local JSON = require("cjson")
 require("mch.controller")
@@ -45,7 +45,7 @@ end
 ctller_ltpv2=mch.controller.Controller:new()
 
 function ctller_ltpv2:get(req,resp,...)
-    resp:ltp('ltp.html',{v=123})
+    resp:ltp('d1_ltp.html',{v=111})
 end
 
 function ctller_ltpv2:after(req,resp)
