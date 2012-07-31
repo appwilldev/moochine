@@ -80,9 +80,11 @@ function content()
     end
     local uri=ngx.var.REQUEST_URI
     local route_map=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
+    local page_found=false
     for k,v in pairs(route_map) do
         local args=string.match(uri, k)
         if args then
+            page_found=true
             local request=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
             local response=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
             if type(v)=="function" then
@@ -96,6 +98,9 @@ function content()
             end
             break
         end
+    end
+    if not page_found then
+        ngx.exit(404)
     end
 end
 

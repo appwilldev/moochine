@@ -18,6 +18,37 @@
 --
 --
 
-print("This will be a MOOCHINE utils to manage moochine-app, coming soon!")
 
 
+HELP_INFO  = [==[
+Usage:
+      moochine new <APP_NAME> <APP_PATH> : create a new moochine app
+      moochine help                      : show this help
+]==]
+
+NGINX_CONF = [==[
+        location / {
+            #...
+            default_type text/html;
+            set $MOOCHINE_HOME '__MOOCHINE_HOME__';
+            set $MOOCHINE_APP_NAME  '__MOOCHINE_APP_NAME__'; 
+            set $MOOCHINE_APP_PATH  '__MOOCHINE_APP_PATH__';
+            access_by_lua_file '$MOOCHINE_HOME/luasrc/mch_access.lua';
+            content_by_lua_file '$MOOCHINE_HOME/luasrc/mch_content.lua';
+            #...
+        }
+]==]
+
+AVAILABLE_CMD={"new","help"}
+
+function __FILE__() return debug.getinfo(2,'S').source end
+
+function show_help_and_exit()
+    print(HELP_INFO)
+    os.exit()
+end
+
+function new_app(name,path)
+end
+
+print(HELP_INFO)
