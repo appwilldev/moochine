@@ -48,7 +48,6 @@ function setup(app_name)
 end
 
 function merge_routings(main_app, subapps)
-    ngx.say("xxxx ".. main_app)
     local main_routings=mch.vars.get(main_app,"ROUTE_INFO")['ROUTE_MAP']
     for k,_ in pairs(subapps) do
         local sub_routings=mch.vars.get(k,"ROUTE_INFO")['ROUTE_MAP']

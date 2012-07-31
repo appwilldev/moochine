@@ -21,6 +21,8 @@
 
 module('mch.util',package.seeall)
 
+local mchvars=require("mch.vars")
+
 function read_all(filename)
     local file = io.open(filename, "r")
     local data = ((file and file:read("*a")) or nil)
@@ -53,6 +55,13 @@ function loadvars(file)
     if f then f() end
     setfenv(1,getmetatable(getfenv(1)).__index)
     return ret
+end
+
+function get_config(k)
+    local ret=var.ngx[k]
+    if ret then return ret end
+    local app_conf=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG")
+    return app_conf[k]
 end
 
 
