@@ -21,6 +21,7 @@
 module('mch.response',package.seeall)
 
 local mchutil=require('mch.util')
+local mchvars=require('mch.vars')
 local functional=require('mch.functional')
 local ltp=require("ltp.template")
 
@@ -101,7 +102,7 @@ function ltp_function(template)
     -- find subapps' templates
     if not tdata then
         tdata=(function(appname)
-                   subapps=mch_vars.get(appname,"APP_CONFIG").subapps or {}
+                   subapps=mchvars.get(appname,"APP_CONFIG").subapps or {}
                    for k,v in pairs(subapps) do
                        d=mchutil.read_all(k.path .. "/templates/" .. template)
                        if d then return d end
