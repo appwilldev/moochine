@@ -20,57 +20,69 @@
 
 mch_vars=nil
 
-function is_inited(init)
+function is_inited(app_name,init)
     local r_G=_G
     local mt=getmetatable(_G)
     if mt then
         r_G=rawget(mt,"__index")
     end
+    if not r_G['moochine_inited'] then
+        r_G['moochine_inited']={}
+    end
     if init == nil then
-        return r_G['moochine_inited']
+        return r_G['moochine_inited'][app_name]
     else
-        r_G['moochine_inited']=init
+        r_G['moochine_inited'][app_name]=init
     end
 end
 
 function setup_app()
-    local app_path = ngx.var.MOOCHINE_APP
-    local mch_home = ngx.var.MOOCHINE_HOME
-    local app_extra= ngx.var.MOOCHINE_APP_EXTRA
+    local mch_home = ngx.var.MOOCHINE_HOME or os.getenv("MOOCHINE_HOME")
+    local app_name = ngx.var.MOOCHINE_APP_NAME
+    local app_path = ngx.var.MOOCHINE_APP_PATH
+    local app_config = app_path .. "/application.lua"
+    
     package.path = mch_home .. '/luasrc/?.lua;' .. package.path
     mch_vars=require("mch.vars")
     local mchutil=require("mch.util")
-    mchutil.setup_app_env(mch_home,app_path,mch_vars.vars())
-    require("routing")
-    if app_extra then
-        mch_vars.set('MOOCHINE_EXTRA_APP_PATH',app_extra)
-        package.path = app_extra .. '/app/?.lua;' .. package.path
-        require("extra_routing")
-    end
+    mchutil.setup_app_env(mch_home,app_name,app_path,mch_vars.vars(app_name))
+    --require("routing")
+    dofile(app_path .. "/app/routing.lua")
 
-    is_inited(true)
+    local config = mchutil.loadvars(app_config)
+    if not config then config={} end
+    if type(config.subapps)=="table" then
+        for k,t in pairs(config.subapps) do
+            local subpath=t.path
+            package.path = subpath .. '/app/?.lua;' .. package.path
+            dofile(subpath .. "/app/routing.lua")
+        end
+        mchrouter=require("mch.router")
+        mchrouter.merge_routings(app_name,config.subapps)
+    end
+    mch_vars.set(app_name,"APP_CONFIG",config)
+    is_inited(app_name,true)
     
 end
 
 function content()
-    if not is_inited() then
+    if not is_inited(ngx.var.MOOCHINE_APP_NAME) then
         setup_app()
     else
         mch_vars=require("mch.vars")
     end
     
-    if not is_inited() then
-        ngx.say('Can not setup MOOCHINE APP')
+    if not is_inited(ngx.var.MOOCHINE_APP_NAME) then
+        ngx.say('Can not setup MOOCHINE APP' .. ngx.var.MOOCHINE_APP_NAME)
         ngx.exit(501)
     end
     local uri=ngx.var.REQUEST_URI
-    local app_env_key='MOOCHINE_APP_' .. mch_vars.get('MOOCHINE_APP')
-    local route_map=mch_vars.get(app_env_key)['route_map']
+    local route_map=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
     for k,v in pairs(route_map) do
         local args=string.match(uri, k)
         if args then
-            local request=mch_vars.get('MOOCHINE_MODULES')['request']
-            local response=mch_vars.get('MOOCHINE_MODULES')['response']
+            local request=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
+            local response=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
             if type(v)=="function" then
                 local response=response.Response:new()
                 v(request.Request:new(),response,args)

@@ -31,9 +31,9 @@ function read_all(filename)
 end
 
 
-function setup_app_env(mch_home,app_path,global)
+function setup_app_env(mch_home,app_name,app_path,global)
     global['MOOCHINE_HOME']=mch_home
-    global['MOOCHINE_APP']=string.match(app_path,'^.*/([^/]+)/?$')
+    global['MOOCHINE_APP']=appname
     global['MOOCHINE_APP_PATH']=app_path
     package.path = mch_home .. '/lualibs/?.lua;' .. package.path
     package.path = app_path .. '/app/?.lua;' .. package.path
@@ -44,6 +44,16 @@ function setup_app_env(mch_home,app_path,global)
     global['MOOCHINE_MODULES']['response']=response
 end
 
+
+function loadvars(file)
+    local ret={}
+    setmetatable(ret,{__index=getfenv(1)})
+    setfenv(1,ret)
+    f=loadfile(file)
+    if f then f() end
+    setfenv(1,getmetatable(getfenv(1)).__index)
+    return ret
+end
 
 
 

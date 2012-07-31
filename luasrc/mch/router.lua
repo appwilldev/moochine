@@ -33,16 +33,26 @@ end
 
 
 function setup(app_name)
-    app_name='MOOCHINE_APP_' .. app_name
-    if not mch.vars.get(app_name) then
-        mch.vars.set(app_name,{})
+    if not mch.vars.get(app_name,"ROUTE_INFO") then
+        mch.vars.set(app_name,"ROUTE_INFO",{})
     end
-    if not mch.vars.get(app_name)['route_map'] then
+    if not mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP'] then
         local route_map={}
-        mch.vars.get(app_name)['route_map']=route_map
+        mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP']=route_map
     end
-    mch.vars.get(app_name)['map']=mch.functional.curry(map,mch.vars.get(app_name)['route_map'])
-    setfenv(2,mch.vars.get(app_name))
+    mch.vars.get(app_name,"ROUTE_INFO")['map'] = mch.functional.curry(
+        map,
+        mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP']
+    )
+    setfenv(2,mch.vars.get(app_name,"ROUTE_INFO"))
 end
 
+function merge_routings(main_app, subapps)
+    ngx.say("xxxx ".. main_app)
+    local main_routings=mch.vars.get(main_app,"ROUTE_INFO")['ROUTE_MAP']
+    for k,_ in pairs(subapps) do
+        local sub_routings=mch.vars.get(k,"ROUTE_INFO")['ROUTE_MAP']
+        for sk,sv in pairs(sub_routings) do main_routings[sk]=sv end
+    end
+end
 

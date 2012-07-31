@@ -91,9 +91,16 @@ ltp_templates_cache={}
 function ltp_function(template)
     ret=ltp_templates_cache[template]
     if ret then return ret end
-    local tdata=mchutil.read_all(MOOCHINE_APP_PATH .. "/templates/" .. template)
+    local tdata=mchutil.read_all(ngx.var.MOOCHINE_APP_PATH .. "/templates/" .. template)
+    -- find subapps' templates
     if not tdata then
-        tdata=mchutil.read_all(MOOCHINE_EXTRA_APP_PATH .. "/templates/" .. template)
+        tdata=(function(appname)
+                   subapps=mch_vars.get(appname,"APP_CONFIG").subapps or {}
+                   for k,v in pairs(subapps) do
+                       d=mchutil.read_all(k.path .. "/templates/" .. template)
+                       if d then return d end
+                   end
+               end)(ngx.var.MOOCHINE_APP_NAME)
     end
     local rfun = ltp.load_template(tdata, '<?lua','?>')
     ltp_templates_cache[template]=rfun

@@ -26,17 +26,26 @@ require 'mch.functional'
 function _setup()
     local mch_global={}
     
-    function _set(k,v)
-        mch_global[k]=v
+    local function _set(app_name,k,v)
+        if not mch_global[app_name] then
+            mch_global[app_name]={}
+        end
+        mch_global[app_name][k]=v
         return v
     end
     
-    function _get(k)
-        return mch_global[k]
+    local function _get(app_name,k)
+        if not mch_global[app_name] then
+            mch_global[app_name]={}
+        end
+        return mch_global[app_name][k]
     end
 
-    function _vars(k)
-        return mch_global
+    local function _vars(app_name)
+        if not mch_global[app_name] then
+            mch_global[app_name]={}
+        end
+        return mch_global[app_name]
     end
    
     return _set,_get, _vars
