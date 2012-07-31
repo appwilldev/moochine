@@ -46,8 +46,6 @@ function setup_app()
     mch_vars=require("mch.vars")
     local mchutil=require("mch.util")
     mchutil.setup_app_env(mch_home,app_name,app_path,mch_vars.vars(app_name))
-    --require("routing")
-    dofile(app_path .. "/app/routing.lua")
 
     local config = mchutil.loadvars(app_config)
     if not config then config={} end
@@ -57,10 +55,14 @@ function setup_app()
             package.path = subpath .. '/app/?.lua;' .. package.path
             dofile(subpath .. "/app/routing.lua")
         end
-        mchrouter=require("mch.router")
-        mchrouter.merge_routings(app_name,config.subapps)
     end
     mch_vars.set(app_name,"APP_CONFIG",config)
+
+    -- load the main-app's routing
+    dofile(app_path .. "/app/routing.lua")
+    -- merge routings
+    mchrouter=require("mch.router")
+    mchrouter.merge_routings(app_name,config.subapps or {})
     is_inited(app_name,true)
     
 end
