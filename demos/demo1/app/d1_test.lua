@@ -26,6 +26,8 @@ end
 
 
 function ltp(req,resp,...)
+    --resp:write(1+"a")
+
     resp:ltp('d1_ltp.html',{v=111})
 end
 

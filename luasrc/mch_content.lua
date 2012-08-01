@@ -19,6 +19,7 @@
 --
 
 mch_vars=nil
+mch_debug=nil
 
 function is_inited(app_name,init)
     local r_G=_G
@@ -44,6 +45,7 @@ function setup_app()
     
     package.path = mch_home .. '/luasrc/?.lua;' .. package.path
     mch_vars=require("mch.vars")
+    mch_debug=require("mch.debug")
     local mchutil=require("mch.util")
     mchutil.setup_app_env(mch_home,app_name,app_path,mch_vars.vars(app_name))
 
@@ -63,6 +65,10 @@ function setup_app()
     -- merge routings
     mchrouter=require("mch.router")
     mchrouter.merge_routings(app_name,config.subapps or {})
+
+    if config.debug and config.debug.on and mch_debug then
+        debug.sethook(mch_debug.debug_hook,"c")
+    end
     is_inited(app_name,true)
     
 end
@@ -72,6 +78,7 @@ function content()
         setup_app()
     else
         mch_vars=require("mch.vars")
+        mch_debug=require("mch.debug")
     end
     
     if not is_inited(ngx.var.MOOCHINE_APP_NAME) then
@@ -89,8 +96,10 @@ function content()
             local response=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
             if type(v)=="function" then
                 local response=response.Response:new()
-                v(request.Request:new(),response,args)
-                ngx.print(response._output)
+                if mch_debug then mch_debug.debug_clear() end
+                local ok, ret=pcall(v,request.Request:new(),response,args)
+                if not ok then response:error(ret) end
+                response:finish()
             elseif type(v)=="table" then
                 v:_handler(request.Request:new(),response.Response:new(),args)
             else

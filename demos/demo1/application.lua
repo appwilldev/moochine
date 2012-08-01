@@ -1,6 +1,11 @@
 
 -- name="demo1"
 
+debug={
+    on=true,
+    to="response", -- log? file?
+}
+
 config={
     templates="templates",
 }

@@ -22,6 +22,7 @@ module('mch.response',package.seeall)
 
 local mchutil=require('mch.util')
 local mchvars=require('mch.vars')
+local mchdebug=require("mch.debug")
 local functional=require('mch.functional')
 local ltp=require("ltp.template")
 
@@ -89,6 +90,29 @@ function Response:set_cookie(key, value, encrypt, duration, path)
     ngx.header["Set-Cookie"]=mch.functional.table_values(self._cookies)
 end
 
+function Response:debug()
+    local debug_conf=mchutil.get_config("debug")
+    local target="log"
+    if debug_conf and type(debug_conf)=="table" then target = debug_conf.to or target end
+    if target == "response" then
+        table_insert(self._output,mchdebug.debug_info().info)
+    end
+    mchdebug.debug_clear()
+end
+
+function Response:error(info) 
+    table_insert(self._output,"ERROR: \r\n" .. info .. "\r\n")
+end
+
+function Response:finish()
+    local debug_conf=mchutil.get_config("debug")
+    if debug_conf and type(debug_conf)=="table" and debug_conf.on then
+        self:debug()
+    end
+    ngx.print(self._output)
+end
+
+
 --[[
 LTP Template Support
 --]]
@@ -122,5 +146,4 @@ function Response:ltp(template,data)
     ltp.execute_template(rfun, data, output)
     table_insert(self._output,output)
 end
-
 

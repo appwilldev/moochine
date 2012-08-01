@@ -20,6 +20,8 @@
 
 module('mch.controller',package.seeall)
 
+local mchdebug=require("mch.debug")
+
 function default_handler(request,response,...)
     ngx.exit(403)
 end
@@ -118,17 +120,22 @@ function Controller:_handler(request,response,...)
     local method=string.lower(ngx.var.request_method)
     local ctller=self:new()
     local handler=ctller[method] or ctller['dummy_handler']
-
-    for i=1,1 do
-        if type(handler)=="function" then
-            ctller:before(request,response)
-            if ctller.finished==true then break end
-            handler(ctller,request,response,...)
-            if ctller.finished==true then break end
-            ctller:after(request,response)
-        end
-    end
-    ngx.print(response._output)
+    local args={...}
+    mchdebug.debug_clear()
+    local ok, ret=pcall(
+        function()
+            for i=1,1 do
+                if type(handler)=="function" then
+                    ctller:before(request,response)
+                    if ctller.finished==true then break end
+                    handler(ctller,request,response,unpack(args))
+                    if ctller.finished==true then break end
+                    ctller:after(request,response)
+                end
+            end
+        end)
+    if not ok then response:error(ret) end
+    response:finish()
 end
 
 

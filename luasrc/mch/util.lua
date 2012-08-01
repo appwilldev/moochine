@@ -48,21 +48,16 @@ end
 
 
 function loadvars(file)
-    local ret={}
-    setmetatable(ret,{__index=getfenv(1)})
-    setfenv(1,ret)
-    f=loadfile(file)
-    if f then f() end
-    setfenv(1,getmetatable(getfenv(1)).__index)
-    return ret
+    local env = setmetatable({}, {__index=_G})
+    assert(pcall(setfenv(assert(loadfile(file)), env)))
+    setmetatable(env, nil)
+    return env
 end
 
 function get_config(k)
-    local ret=var.ngx[k]
+    local ret=ngx.var[k]
     if ret then return ret end
     local app_conf=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG")
     return app_conf[k]
 end
-
-
 
