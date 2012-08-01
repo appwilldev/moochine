@@ -95,7 +95,7 @@ function Response:debug()
     local target="log"
     if debug_conf and type(debug_conf)=="table" then target = debug_conf.to or target end
     if target == "response" then
-        table_insert(self._output,mchdebug.debug_info().info)
+        table_insert(self._output,mchdebug.debug_info2html())
     end
     mchdebug.debug_clear()
 end

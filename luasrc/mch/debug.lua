@@ -38,7 +38,7 @@ function traceback ()
 end
 
 function debug_utils()
-    local debug_info={info=""}
+    local debug_info={info={}}
     
     function _debug_hook(event, extra)
         local info = debug.getinfo(2)
@@ -47,16 +47,12 @@ function debug_utils()
         string.find(info.short_src,"moochine/lualib")) then
             return
         end
-        local sinfo=(string.format("%s function %s in file [%s]:%d,<br/>\r\n",
-                                   event,
-                                   info.name,
-                                   info.short_src,
-                                   info.currentline))
-        debug_info.info = debug_info.info .. sinfo
+        info.event=event
+        table.insert(debug_info.info,info)
     end
 
     function _debug_clear()
-        debug_info.info="<br/><H4>DEBUG INFO:</H4>"
+        debug_info.info={} 
     end
 
     function _debug_info()
@@ -68,5 +64,45 @@ end
 
 
 debug_hook, debug_clear, debug_info = debug_utils()
+
+
+function debug_info2html()
+    local ret ="<br/><H4>DEBUG INFO:</H4>"
+    for _, info in ipairs(debug_info().info) do
+        local estr= "unkown event"
+        if info.event=="call" then
+            estr = " -> "
+        elseif info.event=="return" then
+            estr = " <- "
+        end
+        local sinfo=(string.format("%s [function %s] in file [%s]:%d,<br/>\r\n",
+                                   estr,
+                                   tostring(info.name),
+                                   info.short_src,
+                                   info.currentline))
+        ret = ret .. sinfo
+    end
+    return ret
+end
+
+function debug_info2text()
+    local ret ="DEBUG INFO:\n"
+    for _, info in ipairs(debug_info().info) do
+        local estr= "unkown event"
+        if info.event=="call" then
+            estr = " -> "
+        elseif info.event=="return" then
+            estr = " <- "
+        end
+        local sinfo=(string.format("%s [function %s] in file [%s]:%d,\n",
+                                   estr,
+                                   tostring(info.name),
+                                   info.short_src,
+                                   info.currentline))
+        ret = ret .. sinfo
+    end
+    return ret
+end
+
 
 

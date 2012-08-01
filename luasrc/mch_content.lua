@@ -67,7 +67,7 @@ function setup_app()
     mchrouter.merge_routings(app_name,config.subapps or {})
 
     if config.debug and config.debug.on and mch_debug then
-        debug.sethook(mch_debug.debug_hook,"c")
+        debug.sethook(mch_debug.debug_hook,"cr")
     end
     is_inited(app_name,true)
     
