@@ -96,6 +96,8 @@ function Response:debug()
     if debug_conf and type(debug_conf)=="table" then target = debug_conf.to or target end
     if target == "response" then
         table_insert(self._output,mchdebug.debug_info2html())
+    elseif target== "log" then
+        -- TODO write it to log
     end
     mchdebug.debug_clear()
 end

@@ -21,6 +21,7 @@
 module('mch.debug',package.seeall)
 
 local mchutil=require('mch.util')
+local front=require('mch.front')
 local mchvars=require('mch.vars')
 local functional=require('mch.functional')
 
@@ -43,10 +44,10 @@ function debug_utils()
     function _debug_hook(event, extra)
         local info = debug.getinfo(2)
         if info.currentline<=0 then return end
-        if (string.find(info.short_src,"moochine/luasrc") or 
-        string.find(info.short_src,"moochine/lualib")) then
-            return
-        end
+        --if (string.find(info.short_src,"moochine/luasrc") or 
+        --string.find(info.short_src,"moochine/lualib")) then
+        --return
+        --end
         info.event=event
         table.insert(debug_info.info,info)
     end
@@ -67,7 +68,12 @@ debug_hook, debug_clear, debug_info = debug_utils()
 
 
 function debug_info2html()
-    local ret ="<br/><H4>DEBUG INFO:</H4>"
+    
+    local ret = front.DEBUG_INFO_CSS .. [==[
+                <div id="moochine-table-of-contents">
+                <h2>DEBUG INFO </h2>
+                <div id="moochine-text-table-of-contents"><ul>
+        ]==]
     for _, info in ipairs(debug_info().info) do
         local estr= "unkown event"
         if info.event=="call" then
@@ -75,15 +81,16 @@ function debug_info2html()
         elseif info.event=="return" then
             estr = " <- "
         end
-        local sinfo=(string.format("%s [function %s] in file [%s]:%d,<br/>\r\n",
+        local sinfo=(string.format("<li>%s [function %s] in file [%s]:%d,</li>\r\n",
                                    estr,
                                    tostring(info.name),
                                    info.short_src,
                                    info.currentline))
         ret = ret .. sinfo
     end
-    return ret
+    return ret .. "</ul></div></div>"
 end
+
 
 function debug_info2text()
     local ret ="DEBUG INFO:\n"
