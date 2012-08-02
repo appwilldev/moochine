@@ -92,12 +92,12 @@ end
 
 function Response:debug()
     local debug_conf=mchutil.get_config("debug")
-    local target="log"
+    local target="ngx.log"
     if debug_conf and type(debug_conf)=="table" then target = debug_conf.to or target end
     if target == "response" then
         table_insert(self._output,mchdebug.debug_info2html())
-    elseif target== "log" then
-        -- TODO write it to log
+    elseif target== "ngx.log" then
+        ngx.log(ngx.DEBUG, mchdebug.debug_info2text())
     end
     mchdebug.debug_clear()
 end

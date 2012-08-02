@@ -51,14 +51,16 @@ function setup_app()
 
     local config = mchutil.loadvars(app_config)
     if not config then config={} end
+    mch_vars.set(app_name,"APP_CONFIG",config)
+    
     if type(config.subapps)=="table" then
         for k,t in pairs(config.subapps) do
             local subpath=t.path
             package.path = subpath .. '/app/?.lua;' .. package.path
+            mch_vars.set(k, "APP_CONFIG", t.config)
             dofile(subpath .. "/routing.lua")
         end
     end
-    mch_vars.set(app_name,"APP_CONFIG",config)
 
     -- load the main-app's routing
     dofile(app_path .. "/routing.lua")

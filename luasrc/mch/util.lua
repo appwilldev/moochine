@@ -54,10 +54,23 @@ function loadvars(file)
     return env
 end
 
-function get_config(k)
-    local ret=ngx.var[k]
-    if ret then return ret end
-    local app_conf=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG")
-    return app_conf[k]
+function get_config(appname, key)
+    
+    if key==nil then
+        key=appname
+        appname=ngx.var.MOOCHINE_APP_NAME
+    end
+    if appname == ngx.var.MOOCHINE_APP_NAME then
+        local ret=ngx.var[key]
+        if ret then return ret end
+        local app_conf=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG")
+        return app_conf[key]
+    end
+    
+    local subapps=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG").subapps or {}
+    local subconfig=subapps[appname].config or {}
+    return subconfig[key]
+    
 end
+
 

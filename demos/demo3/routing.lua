@@ -11,8 +11,10 @@ mch_router.setup('demo3')
 -----------------------------------------------
 -- 1.simple function mapping
 map('^/1/hello3%?name=(.*)',"d3_test.hello")
-map('^/1/ltp3$',"d3_test.ltp")
 
+if get_config("ltp") then
+    map('^/1/ltp3$',"d3_test.ltp")
+end
 
 -- 2.mch controller mapping
 map('^/1/hello_v2%?name=(.*)',"d3_test_v2.ctller_v2")

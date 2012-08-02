@@ -23,7 +23,7 @@ module('mch.router',package.seeall)
 
 require 'mch.functional'
 require 'mch.vars'
-
+require 'mch.util'
 
 function map(route_table, uri, func_name)
     local mod,fn = string.match(func_name,'^(.+)%.([^.]+)$')
@@ -43,6 +43,11 @@ function setup(app_name)
     mch.vars.get(app_name,"ROUTE_INFO")['map'] = mch.functional.curry(
         map,
         mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP']
+    )
+        
+    mch.vars.get(app_name,"ROUTE_INFO")['get_config'] = mch.functional.curry(
+        mch.util.get_config,
+        app_name
     )
     setfenv(2,mch.vars.get(app_name,"ROUTE_INFO"))
 end
