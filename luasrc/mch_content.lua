@@ -79,6 +79,7 @@ function content()
     if not is_inited(ngx.var.MOOCHINE_APP_NAME) then
         local ok, ret=pcall(setup_app)
         if not ok then
+            ngx.status=500
             ngx.say("APP SETUP ERROR: " .. ret)
             return
         end

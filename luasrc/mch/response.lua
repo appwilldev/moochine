@@ -102,7 +102,8 @@ function Response:debug()
     mchdebug.debug_clear()
 end
 
-function Response:error(info) 
+function Response:error(info)
+    ngx.status=500
     table_insert(self._output,"ERROR: \r\n" .. info .. "\r\n")
 end
 
