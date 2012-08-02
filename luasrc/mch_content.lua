@@ -77,7 +77,11 @@ end
 
 function content()
     if not is_inited(ngx.var.MOOCHINE_APP_NAME) then
-        setup_app()
+        local ok, ret=pcall(setup_app)
+        if not ok then
+            ngx.say("APP SETUP ERROR: " .. ret)
+            return
+        end
     else
         mch_vars=require("mch.vars")
         mch_debug=require("mch.debug")
