@@ -25,19 +25,14 @@ module('mch.functional',package.seeall)
 -- common functional tools
 --]]
 
-function _curry(func, arg)
-    local curry_args= arg
-    function inner(...)
-        return func(curry_args,...)
-    end
-    return inner
-end
 
 function curry(func, ...)
-    local inner=func
-    for i=1,select("#", ...) do
-        argi=select(i, ...)
-        inner=_curry(inner,argi)
+    local args={...}
+    local function inner(...)
+        local _args={...}
+        local real_args={unpack(args)}
+        for _,v in ipairs(_args) do table.insert(real_args,v) end
+        return func(unpack(real_args))
     end
     return inner
 end

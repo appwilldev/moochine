@@ -5,7 +5,7 @@ ltp=true
 
 debug={
     on=true,
-    to="response", -- log? file?
+    to="response", -- "ngx.log"
 }
 
 config={
@@ -13,10 +13,13 @@ config={
 }
 
 subapps={
-    demo3 = {path="/Volumes/KDr2/Work/appwill/moochine/demos/demo3", config={
-                 test="a test config",
-                 ltp=true
-         }},
+    demo3 = {
+        path="/Volumes/KDr2/Work/appwill/moochine/demos/demo3",
+        config={
+            test="a test config",
+            ltp=true
+        }
+    },
 }
 
 

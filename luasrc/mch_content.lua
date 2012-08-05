@@ -94,11 +94,13 @@ function content()
     end
     local uri=ngx.var.REQUEST_URI
     local route_map=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
+    local route_order=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_ORDER']
     local page_found=false
-    for k,v in pairs(route_map) do
+    for _,k in ipairs(route_order) do
         local args=string.match(uri, k)
         if args then
             page_found=true
+            local v=route_map[k]
             local request=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
             local response=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
             if type(v)=="function" then
