@@ -58,12 +58,14 @@ function setup_app()
             local subpath=t.path
             package.path = subpath .. '/app/?.lua;' .. package.path
             mch_vars.set(k, "APP_CONFIG", t.config)
-            dofile(subpath .. "/routing.lua")
+            local env = setmetatable({__CURRENT_APP_NAME__=k}, {__index=_G})
+            setfenv(assert(loadfile(subpath .. "/routing.lua")), env)()
         end
     end
 
     -- load the main-app's routing
-    dofile(app_path .. "/routing.lua")
+    local env = setmetatable({__CURRENT_APP_NAME__=app_name}, {__index=_G})
+    pcall(setfenv(assert(loadfile(app_path .. "/routing.lua")), env))
     -- merge routings
     mchrouter=require("mch.router")
     mchrouter.merge_routings(app_name,config.subapps or {})

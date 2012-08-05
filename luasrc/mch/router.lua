@@ -43,7 +43,8 @@ function map(route_table, route_order, uri, func_name)
 end
 
 
-function setup(app_name)
+function setup()
+    local app_name=getfenv(2).__CURRENT_APP_NAME__
     if not mch.vars.get(app_name,"ROUTE_INFO") then
         mch.vars.set(app_name,"ROUTE_INFO",{})
     end

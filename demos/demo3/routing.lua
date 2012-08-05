@@ -6,7 +6,7 @@
 
 
 mch_router=require 'mch.router'
-mch_router.setup('demo3')
+mch_router.setup()
 
 -----------------------------------------------
 -- 1.simple function mapping

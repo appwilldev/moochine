@@ -6,7 +6,7 @@
 
 
 mch_router=require 'mch.router'
-mch_router.setup('demo1')
+mch_router.setup()
 
 
 

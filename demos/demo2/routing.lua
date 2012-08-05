@@ -5,7 +5,7 @@
 --
 
 local router=require('mch.router')
-router.setup("demo2")
+router.setup()
 
 -----------------------------------------------
 -- 1.simple function mapping
