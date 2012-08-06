@@ -21,19 +21,19 @@
 mch_vars = nil
 mch_debug = nil
 
-function is_inited(app_name,init)
-    local r_G=_G
-    local mt=getmetatable(_G)
+function is_inited(app_name, init)
+    local r_G = _G
+    local mt = getmetatable(_G)
     if mt then
-        r_G=rawget(mt,"__index")
+        r_G = rawget(mt,"__index")
     end
     if not r_G['moochine_inited'] then
-        r_G['moochine_inited']={}
+        r_G['moochine_inited'] = {}
     end
     if init == nil then
         return r_G['moochine_inited'][app_name]
     else
-        r_G['moochine_inited'][app_name]=init
+        r_G['moochine_inited'][app_name] = init
     end
 end
 
@@ -56,7 +56,7 @@ function setup_app()
     
     if type(config.subapps)=="table" then
         for k,t in pairs(config.subapps) do
-            local subpath=t.path
+            local subpath = t.path
             package.path = subpath .. '/app/?.lua;' .. package.path
             mch_vars.set(k, "APP_CONFIG", t.config)
             local env = setmetatable({__CURRENT_APP_NAME__=k}, {__index=_G})
@@ -66,33 +66,30 @@ function setup_app()
 
     -- load the main-app's routing
     local env = setmetatable({__CURRENT_APP_NAME__=app_name}, {__index=_G})
-    local st, errmsg
-    st, errmsg = pcall(setfenv(assert(loadfile(app_path .. "/routing.lua")), env))
-    if not st then
-	__logger:warn('Error while loading routing.lua:\n%s', errmsg)
-    end
+    (setfenv(assert(loadfile(app_path .. "/routing.lua")), env))()
+    
     -- merge routings
-    mchrouter=require("mch.router")
+    mchrouter = require("mch.router")
     mchrouter.merge_routings(app_name, config.subapps or {})
 
     if config.debug and config.debug.on and mch_debug then
         debug.sethook(mch_debug.debug_hook, "cr")
     end
-    is_inited(app_name,true)
+    is_inited(app_name, true)
     
 end
 
 function content()
     if not is_inited(ngx.var.MOOCHINE_APP_NAME) then
-        local ok, ret=pcall(setup_app)
+        local ok, ret = pcall(setup_app)
         if not ok then
-            ngx.status=500
+            ngx.status = 500
             ngx.say("APP SETUP ERROR: " .. ret)
             return
         end
     else
-        mch_vars=require("mch.vars")
-        mch_debug=require("mch.debug")
+        mch_vars = require("mch.vars")
+        mch_debug = require("mch.debug")
     end
     
     if not is_inited(ngx.var.MOOCHINE_APP_NAME) then
@@ -100,20 +97,20 @@ function content()
         ngx.exit(501)
     end
     local uri=ngx.var.REQUEST_URI
-    local route_map=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
-    local route_order=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_ORDER']
-    local page_found=false
+    local route_map = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
+    local route_order = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_ORDER']
+    local page_found = false
     for _,k in ipairs(route_order) do
         local args=string.match(uri, k)
         if args then
-            page_found=true
-            local v=route_map[k]
-            local request=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
-            local response=mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
+            page_found = true
+            local v = route_map[k]
+            local request = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
+            local response = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
             if type(v)=="function" then
-                local response=response.Response:new()
+                local response = response.Response:new()
                 if mch_debug then mch_debug.debug_clear() end
-                local ok, ret=pcall(v,request.Request:new(),response,args)
+                local ok, ret = pcall(v,request.Request:new(),response,args)
                 if not ok then response:error(ret) end
                 response:finish()
             elseif type(v)=="table" then
@@ -129,6 +126,7 @@ function content()
     end
 end
 
+----------
 content()
-
+----------
 
