@@ -52,7 +52,7 @@ function setup()
         mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP']={}
         mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_ORDER']={}
     end
-    mch.vars.get(app_name,"ROUTE_INFO")['map'] = mch.functional.curry(
+    mch.vars.get(app_name, "ROUTE_INFO")['map'] = mch.functional.curry(
         map,
         mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP'],
         mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_ORDER']
@@ -62,7 +62,7 @@ function setup()
         mch.util.get_config,
         app_name
     )
-    setfenv(2,mch.vars.get(app_name,"ROUTE_INFO"))
+    setfenv(2, mch.vars.get(app_name,"ROUTE_INFO"))
 end
 
 function merge_routings(main_app, subapps)

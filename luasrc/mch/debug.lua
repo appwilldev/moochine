@@ -93,9 +93,9 @@ end
 
 
 function debug_info2text()
-    local ret ="DEBUG INFO:\n"
+    local ret = "DEBUG INFO:\n"
     for _, info in ipairs(debug_info().info) do
-        local estr= "unkown event"
+        local estr = "unkown event"
         if info.event=="call" then
             estr = " -> "
         elseif info.event=="return" then

@@ -19,7 +19,7 @@
 --
 
 
-module('mch.vars',package.seeall)
+module('mch.vars', package.seeall)
 
 require 'mch.functional'
 
@@ -34,7 +34,7 @@ function _setup()
         return v
     end
     
-    local function _get(app_name,k)
+    local function _get(app_name, k)
         if not mch_global[app_name] then
             mch_global[app_name]={}
         end
@@ -48,9 +48,9 @@ function _setup()
         return mch_global[app_name]
     end
    
-    return _set,_get, _vars
+    return _set, _get, _vars
 end
 
-set,get,vars=_setup()
+set, get, vars = _setup()
 
 

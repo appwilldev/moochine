@@ -18,8 +18,8 @@
 --
 --
 
-mch_vars=nil
-mch_debug=nil
+mch_vars = nil
+mch_debug = nil
 
 function is_inited(app_name,init)
     local r_G=_G
@@ -44,10 +44,11 @@ function setup_app()
     local app_config = app_path .. "/application.lua"
     
     package.path = mch_home .. '/luasrc/?.lua;' .. package.path
-    mch_vars=require("mch.vars")
-    mch_debug=require("mch.debug")
-    local mchutil=require("mch.util")
-    mchutil.setup_app_env(mch_home,app_name,app_path,mch_vars.vars(app_name))
+    mch_vars = require("mch.vars")
+    mch_debug = require("mch.debug")
+    local mchutil = require("mch.util")
+    mchutil.setup_app_env(mch_home, app_name, app_path,
+			  mch_vars.vars(app_name))
 
     local config = mchutil.loadvars(app_config)
     if not config then config={} end
@@ -65,13 +66,17 @@ function setup_app()
 
     -- load the main-app's routing
     local env = setmetatable({__CURRENT_APP_NAME__=app_name}, {__index=_G})
-    pcall(setfenv(assert(loadfile(app_path .. "/routing.lua")), env))
+    local st, errmsg
+    st, errmsg = pcall(setfenv(assert(loadfile(app_path .. "/routing.lua")), env))
+    if not st then
+	__logger:warn('Error while loading routing.lua:\n%s', errmsg)
+    end
     -- merge routings
     mchrouter=require("mch.router")
-    mchrouter.merge_routings(app_name,config.subapps or {})
+    mchrouter.merge_routings(app_name, config.subapps or {})
 
     if config.debug and config.debug.on and mch_debug then
-        debug.sethook(mch_debug.debug_hook,"cr")
+        debug.sethook(mch_debug.debug_hook, "cr")
     end
     is_inited(app_name,true)
     

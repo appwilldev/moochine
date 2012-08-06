@@ -18,7 +18,7 @@
 --
 --
 
-module('mch.front',package.seeall)
+module('mch.front', package.seeall)
 
 DEBUG_INFO_CSS=[==[
             <style rel="stylesheet" type="text/css">
@@ -30,8 +30,10 @@ DEBUG_INFO_CSS=[==[
                 background: white;
                 -webkit-box-shadow: 0 0 1em #777777;
                 -moz-box-shadow: 0 0 1em #777777;
+                box-shadow: 0 0 1em #777777;
                 -webkit-border-bottom-left-radius: 5px;
                 -moz-border-radius-bottomleft: 5px;
+                border-radius-bottomleft: 5px;
                 text-align: right;
                 /* ensure doesn't flow off the screen when expanded */
                 max-height: 80%;
@@ -72,4 +74,3 @@ DEBUG_INFO_CSS=[==[
             </style>
         ]==]
 
-    
