@@ -66,7 +66,7 @@ function setup_app()
 
     -- load the main-app's routing
     local env = setmetatable({__CURRENT_APP_NAME__=app_name}, {__index=_G})
-    (setfenv(assert(loadfile(app_path .. "/routing.lua")), env))()
+    setfenv(assert(loadfile(app_path .. "/routing.lua")), env)()
     
     -- merge routings
     mchrouter = require("mch.router")
