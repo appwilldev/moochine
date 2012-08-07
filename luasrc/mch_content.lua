@@ -61,6 +61,7 @@ function setup_app()
     local config = mchutil.loadvars(app_config)
     if not config then config={} end
     mch_vars.set(app_name,"APP_CONFIG",config)
+    is_inited(app_name, true)
     
     if type(config.subapps)=="table" then
         for k,t in pairs(config.subapps) do
@@ -87,7 +88,6 @@ function setup_app()
     if config.debug and config.debug.on and mch_debug then
         debug.sethook(mch_debug.debug_hook, "cr")
     end
-    is_inited(app_name, true)
     
 end
 
