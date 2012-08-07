@@ -48,7 +48,7 @@ function get_logger(appname)
 
     local function log_appender(self, level, message)
         local date = os.date("%m-%d %H:%M:%S")
-        local frame = debug.getinfo(2)
+        local frame = debug.getinfo(4)
         local s = string.format('[%s] [%s] [%s:%d] %s\n',
                                 date, level,
                                 string.gsub(frame.short_src, '%.lua$', ''),
@@ -64,18 +64,21 @@ function get_logger(appname)
     logger._log = logger.log
     logger._setLevel = logger.setLevel
 
-    logger.log=function(self, level, ...)
-                   local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
-                   _logger._log(self, level, ...)
-               end
-    logger.setLevel=function(self, level, ...)
-                        local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
-                        _logger:_log("ERROR", "Can not setLevel")
-                    end
+    logger.log = function(self, level, ...)
+                     local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
+                     _logger._log(self, level, ...)
+                 end
+    logger.setLevel = function(self, level, ...)
+                          local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
+                          _logger:_log("ERROR", "Can not setLevel")
+                      end
     -- for _, l in ipairs(logging.LEVEL) do -- logging does not export this variable :(
     local levels = {d = "DEBUG", i = "INFO", w = "WARN", e = "ERROR", f = "FATAL"}
     for k, l in pairs(levels) do
-        logger[k] = logger[string.lower(l)] 
+        logger[k] = function(self, ...)
+                        logger.log(self, l, ...)
+                    end
+        logger[string.lower(l)] = logger[k]
     end
     
     return logger
