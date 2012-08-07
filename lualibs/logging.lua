@@ -13,6 +13,7 @@ local select = select
 local error = error
 local format = string.format
 local pcall = pcall
+local getmetatable, rawget = getmetatable, rawget
 
 module("logging")
 
@@ -152,8 +153,19 @@ end
 --
 -- Converts Table fields in alphabetical order
 -------------------------------------------------------------------------------
-function tostring(value)
+function tostring(value, visited)
+  self_tostring = rawget(getmetatable(value) or {}, '__tostring')
+  if self_tostring then return self_tostring(value) end
   local str = ''
+  if visited == nil then
+    visited = {
+      [value] = true
+    }
+  elseif visited[value] then
+    return _tostring(value)
+  else
+    visited[value] = true
+  end
 
   if (type(value) ~= 'table') then
     if (type(value) == 'string') then
@@ -167,7 +179,7 @@ function tostring(value)
       if (tonumber(i) ~= i) then
         table.insert(auxTable, i)
       else
-        table.insert(auxTable, tostring(i))
+        table.insert(auxTable, tostring(i, visited))
       end
     end)
     pcall(table.sort, auxTable)
@@ -177,9 +189,9 @@ function tostring(value)
     local entry = ""
     table.foreachi (auxTable, function (i, fieldName)
       if ((tonumber(fieldName)) and (tonumber(fieldName) > 0)) then
-        entry = tostring(value[tonumber(fieldName)])
+        entry = tostring(value[tonumber(fieldName)], visited)
       else
-        entry = tostring(fieldName).." = "..tostring(value[fieldName])
+        entry = tostring(fieldName, visited).." = "..tostring(value[fieldName], visited)
       end
       str = str..separator..entry
       separator = ", "
