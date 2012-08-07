@@ -52,7 +52,8 @@ function setup()
         mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP']={}
         mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_ORDER']={}
     end
-    mch.vars.get(app_name, "ROUTE_INFO").__logger = getfenv(2).__LOGGER
+    mch.vars.get(app_name, "ROUTE_INFO").__logger = getfenv(2).__LOGGER -- TODO remove this line
+    mch.vars.get(app_name, "ROUTE_INFO").logger = getfenv(2).__LOGGER
     mch.vars.get(app_name, "ROUTE_INFO")['map'] = mch.functional.curry(
         map,
         mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP'],

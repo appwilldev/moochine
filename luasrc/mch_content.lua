@@ -37,7 +37,8 @@ function is_inited(app_name, init)
         if init then
             -- put __logger into _G
             local logger = require("mch.logger")
-            r_G["__logger"] = logger.logger()
+            r_G["__logger"] = logger.logger() -- TODO remove this line
+            r_G["logger"] = logger.logger()
         end
     end
 end
