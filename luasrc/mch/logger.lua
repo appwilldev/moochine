@@ -74,11 +74,8 @@ function get_logger(appname)
                     end
     -- for _, l in ipairs(logging.LEVEL) do -- logging does not export this variable :(
     local levels = {d = "DEBUG", i = "INFO", w = "WARN", e = "ERROR", f = "FATAL"}
-    for k, l in ipairs(levels) do
-        logger[k] = function(self, ...)
-                        logger.log(self, l, ...)
-                    end
-        logger[string.lower(l)] = logger[k]
+    for k, l in pairs(levels) do
+        logger[k] = logger[string.lower(l)] 
     end
     
     return logger
