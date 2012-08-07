@@ -158,9 +158,11 @@ function tostring(value, visited)
   if self_tostring then return self_tostring(value) end
   local str = ''
   if visited == nil then
-    visited = {
-      [value] = true
-    }
+    if value ~= nil then
+      visited = {
+        [value] = true
+      }
+    end
   elseif visited[value] then
     return _tostring(value)
   else
