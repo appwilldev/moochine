@@ -48,7 +48,7 @@ function get_logger(appname)
 
     local function log_appender(self, level, message)
         local date = os.date("%m-%d %H:%M:%S")
-        local frame = debug.getinfo(3)
+        local frame = debug.getinfo(2)
         local s = string.format('[%s] [%s] [%s:%d] %s\n',
                                 date, level,
                                 string.gsub(frame.short_src, '%.lua$', ''),
@@ -74,11 +74,8 @@ function get_logger(appname)
                     end
     -- for _, l in ipairs(logging.LEVEL) do -- logging does not export this variable :(
     local levels = {d = "DEBUG", i = "INFO", w = "WARN", e = "ERROR", f = "FATAL"}
-    for k, l in ipairs(levels) do
-        logger[k] = function(self, ...)
-                        logger.log(self, l, ...)
-                    end
-        logger[string.lower(l)] = logger[k]
+    for k, l in pairs(levels) do
+        logger[k] = logger[string.lower(l)] 
     end
     
     return logger
