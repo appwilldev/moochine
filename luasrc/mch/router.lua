@@ -67,7 +67,7 @@ function setup()
         mch.util.get_config,
         getfenv(2).__CURRENT_APP_NAME__
     )
-    setfenv(2, mch.vars.get(app_name,"ROUTE_INFO"))
+    setfenv(2, mch.vars.get(app_name, "ROUTE_INFO"))
 end
 
 function merge_routings(main_app, subapps)

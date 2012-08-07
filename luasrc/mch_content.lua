@@ -63,6 +63,8 @@ function setup_app()
     if not config then config={} end
     mch_vars.set(app_name,"APP_CONFIG",config)
     
+    is_inited(app_name, true)
+    
     if type(config.subapps) == "table" then
         for k, t in pairs(config.subapps) do
             local subpath = t.path
@@ -90,8 +92,6 @@ function setup_app()
         debug.sethook(mch_debug.debug_hook, "cr")
     end
 
-    is_inited(app_name, true)
-    
 end
 
 function content()
