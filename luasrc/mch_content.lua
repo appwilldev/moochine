@@ -36,9 +36,8 @@ function is_inited(app_name, init)
     else
         r_G['moochine_inited'][app_name] = init
         if init then
-            -- put __logger into _G
+            -- put logger into _G
             local logger = require("mch.logger")
-            r_G["__logger"] = logger.logger() -- TODO remove this line
             r_G["logger"] = logger.logger()
         end
     end
@@ -63,14 +62,13 @@ function setup_app()
     local config = mchutil.loadvars(app_config)
     if not config then config={} end
     mch_vars.set(app_name,"APP_CONFIG",config)
-    is_inited(app_name, true)
     
     if type(config.subapps) == "table" then
         for k, t in pairs(config.subapps) do
             local subpath = t.path
             package.path = subpath .. '/app/?.lua;' .. package.path
-            mch_vars.set(k, "APP_CONFIG", t.config)
             local env = setmetatable({__CURRENT_APP_NAME__ = k,
+                                      __MAIN_APP_NAME__ = app_name,
                                       __LOGGER = logger.logger()},
                                      {__index = _G})
             setfenv(assert(loadfile(subpath .. "/routing.lua")), env)()
@@ -79,6 +77,7 @@ function setup_app()
 
     -- load the main-app's routing
     local env = setmetatable({__CURRENT_APP_NAME__ = app_name,
+                              __MAIN_APP_NAME__ = app_name,
                               __LOGGER = logger.logger()},
                              {__index = _G})
     setfenv(assert(loadfile(app_path .. "/routing.lua")), env)()
@@ -90,6 +89,8 @@ function setup_app()
     if config.debug and config.debug.on and mch_debug then
         debug.sethook(mch_debug.debug_hook, "cr")
     end
+
+    is_inited(app_name, true)
     
 end
 

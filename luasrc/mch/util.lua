@@ -56,12 +56,12 @@ end
 
 function get_config(appname, key)
     
-    if key==nil then
-        key=appname
-        appname=ngx.var.MOOCHINE_APP_NAME
+    if key == nil then
+        key = appname
+        appname = ngx.var.MOOCHINE_APP_NAME
     end
     if appname == ngx.var.MOOCHINE_APP_NAME then
-        local ret=ngx.var[key]
+        local ret = ngx.var[key]
         if ret then return ret end
         local app_conf=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG")
         return app_conf[key]
