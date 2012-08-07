@@ -26,7 +26,8 @@ end
 
 
 function ltp(req,resp,...)
-    resp:write(1+"a")
+    -- resp:write(1+"a")
+    __logger:log("DEBUG", "hahaha")
     resp:ltp('d1_ltp.html',{v=111})
 end
 

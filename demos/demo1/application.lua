@@ -3,6 +3,11 @@
 
 ltp=true
 
+logger = {
+    file = "/tmp/moochine_demo1.log",
+    level = "ERROR",
+}
+
 debug={
     on=true,
     to="response", -- "ngx.log"

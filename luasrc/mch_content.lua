@@ -34,6 +34,11 @@ function is_inited(app_name, init)
         return r_G['moochine_inited'][app_name]
     else
         r_G['moochine_inited'][app_name] = init
+        if init then
+            -- put __logger into _G
+            local logger = require("mch.logger")
+            r_G["__logger"] = logger.logger()
+        end
     end
 end
 
@@ -50,6 +55,8 @@ function setup_app()
     mchutil.setup_app_env(mch_home, app_name, app_path,
 			  mch_vars.vars(app_name))
 
+    local logger = require("mch.logger")
+        
     local config = mchutil.loadvars(app_config)
     if not config then config={} end
     mch_vars.set(app_name,"APP_CONFIG",config)
@@ -59,13 +66,17 @@ function setup_app()
             local subpath = t.path
             package.path = subpath .. '/app/?.lua;' .. package.path
             mch_vars.set(k, "APP_CONFIG", t.config)
-            local env = setmetatable({__CURRENT_APP_NAME__=k}, {__index=_G})
+            local env = setmetatable({__CURRENT_APP_NAME__ = k,
+                                      __LOGGER = logger.logger()},
+                                     {__index = _G})
             setfenv(assert(loadfile(subpath .. "/routing.lua")), env)()
         end
     end
 
     -- load the main-app's routing
-    local env = setmetatable({__CURRENT_APP_NAME__=app_name}, {__index=_G})
+    local env = setmetatable({__CURRENT_APP_NAME__ = app_name,
+                              __LOGGER = logger.logger()},
+                             {__index = _G})
     setfenv(assert(loadfile(app_path .. "/routing.lua")), env)()
     
     -- merge routings

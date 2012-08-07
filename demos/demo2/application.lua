@@ -1,6 +1,12 @@
 
 name="demo2"
 
+logger = {
+    file = "/tmp/moochine_demo2.log",
+    level = "DEBUG",
+}
+
+
 config={
     templates="templates",
 }
