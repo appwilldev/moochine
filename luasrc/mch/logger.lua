@@ -63,6 +63,23 @@ function get_logger(appname)
     mchvars.set(appname, "__LOGGER", logger)
     logger._log = logger.log
     logger._setLevel = logger.setLevel
+
+    logger.log=function(self, level, ...)
+                   local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
+                   _logger._log(self, level, ...)
+               end
+    logger.setLevel=function(self, level, ...)
+                        local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
+                        _logger:_log("ERROR", "Can not setLevel")
+                    end
+    -- for _, l in ipairs(logging.LEVEL) do -- logging does not export this variable :(
+    local levels = {"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
+    for _, l in ipairs(levels) do
+        logger[string.lower(l)]=function(self, ...)
+                                    logger.log(self, l, ...)
+                                end
+    end
+    
     return logger
 end
 
@@ -70,14 +87,6 @@ end
 
 function logger()
     local logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
-    logger.log=function(self, level, ...)
-                   local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
-                   _logger._log(self, level, ...)
-               end
-    logger.setLevel=function(self, level, ...)
-                   local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
-                   _logger:_log("ERROR", "Can not setLevel")
-               end
     return logger
 end
 

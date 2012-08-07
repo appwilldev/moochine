@@ -27,7 +27,7 @@ end
 
 
 function ltp(req,resp,...)
-    __logger:log("DEBUG","test logger in demo2")
+    __logger:debug("test logger in demo2")
     resp:ltp('d2_ltp.html',{v=222})
 end
 
