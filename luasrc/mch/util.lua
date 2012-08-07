@@ -68,7 +68,6 @@ function get_config(appname, key)
     end
     
     local subapps=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG").subapps or {}
-    ngx.log(ngx.ERR,"===",appname)
     local subconfig=subapps[appname].config or {}
     return subconfig[key]
     
