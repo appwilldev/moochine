@@ -80,15 +80,14 @@ function get_logger(appname)
                     end
         logger[string.lower(l)] = logger[k]
     end
+    logger.tostring = logging.tostring
+    logger.table_print = mchutil.table_print
     
     return logger
 end
-
-
 
 function logger()
     local logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
     return logger
 end
-
 

@@ -73,4 +73,36 @@ function get_config(appname, key)
     
 end
 
+function _strify(o, tab, act, logged)
+    local v = tostring(o)
+    if logged[o] then return v end
+    if string.sub(v,0,6) == "table:" then
+        logged[o] = true
+        act = "\n" .. string.rep("|    ",tab) .. "{ [".. tostring(o) .. ", "
+        act = act .. table_real_length(o) .." item(s)]"
+        for k, v in pairs(o) do
+            act = act .."\n" .. string.rep("|    ", tab)
+            act = act .. "|   *".. k .. "\t=>\t" .. _strify(v, tab+1, act, logged)
+        end
+        act = act .. "\n" .. string.rep("|    ",tab) .. "}"
+        return act
+    else
+        return v
+    end
+end
 
+function strify(o) return _strify(o, 1, "", {}) end
+
+function table_print(t)
+    local s1="\n* Table String:"
+    local s2="\n* End Table"
+    return s1 .. strify(t) .. s2
+end
+
+function table_real_length(t)
+    local count = 0
+    for _ in pairs(t) do
+        count = count + 1
+    end
+    return count
+end
