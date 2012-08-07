@@ -35,11 +35,11 @@ function route_sorter(luri, ruri)
 end
 
 function map(route_table, route_order, uri, func_name)
-    local mod,fn = string.match(func_name,'^(.+)%.([^.]+)$')
-    mod=require(mod)
-    route_table[uri]=mod[fn]
-    table.insert(route_order,uri)
-    -- table.sort(route_order,route_sorter) -- sort when merge!
+    local mod, fn = string.match(func_name, '^(.+)%.([^.]+)$')
+    mod = require(mod)
+    route_table[uri] = mod[fn]
+    table.insert(route_order, uri)
+    -- table.sort(route_order, route_sorter) -- sort when merge!
 end
 
 
@@ -49,8 +49,8 @@ function setup()
         mch.vars.set(app_name,"ROUTE_INFO",{})
     end
     if not mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP'] then
-        mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP']={}
-        mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_ORDER']={}
+        mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_MAP'] = {}
+        mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_ORDER'] = {}
     end
     mch.vars.get(app_name, "ROUTE_INFO").__logger = getfenv(2).__LOGGER -- TODO remove this line
     mch.vars.get(app_name, "ROUTE_INFO").logger = getfenv(2).__LOGGER

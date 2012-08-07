@@ -22,10 +22,11 @@ mch_vars = nil
 mch_debug = nil
 
 function is_inited(app_name, init)
+    -- get/set the inited flag for app_name
     local r_G = _G
     local mt = getmetatable(_G)
     if mt then
-        r_G = rawget(mt,"__index")
+        r_G = rawget(mt, "__index")
     end
     if not r_G['moochine_inited'] then
         r_G['moochine_inited'] = {}
@@ -53,8 +54,9 @@ function setup_app()
     mch_vars = require("mch.vars")
     mch_debug = require("mch.debug")
     local mchutil = require("mch.util")
+    -- setup vars and add to package.path
     mchutil.setup_app_env(mch_home, app_name, app_path,
-			  mch_vars.vars(app_name))
+                          mch_vars.vars(app_name))
 
     local logger = require("mch.logger")
         
@@ -63,8 +65,8 @@ function setup_app()
     mch_vars.set(app_name,"APP_CONFIG",config)
     is_inited(app_name, true)
     
-    if type(config.subapps)=="table" then
-        for k,t in pairs(config.subapps) do
+    if type(config.subapps) == "table" then
+        for k, t in pairs(config.subapps) do
             local subpath = t.path
             package.path = subpath .. '/app/?.lua;' .. package.path
             mch_vars.set(k, "APP_CONFIG", t.config)
@@ -108,25 +110,26 @@ function content()
         ngx.say('Can not setup MOOCHINE APP' .. ngx.var.MOOCHINE_APP_NAME)
         ngx.exit(501)
     end
-    local uri=ngx.var.REQUEST_URI
+    local uri = ngx.var.REQUEST_URI
     local route_map = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
     local route_order = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_ORDER']
     local page_found = false
-    for _,k in ipairs(route_order) do
-        local args=string.match(uri, k)
+    -- match order by definition order
+    for _, k in ipairs(route_order) do
+        local args = string.match(uri, k)
         if args then
             page_found = true
             local v = route_map[k]
             local request = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
             local response = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
-            if type(v)=="function" then
+            if type(v) == "function" then
                 local response = response.Response:new()
                 if mch_debug then mch_debug.debug_clear() end
-                local ok, ret = pcall(v,request.Request:new(),response,args)
+                local ok, ret = pcall(v, request.Request:new(), response, args)
                 if not ok then response:error(ret) end
                 response:finish()
-            elseif type(v)=="table" then
-                v:_handler(request.Request:new(),response.Response:new(),args)
+            elseif type(v) == "table" then
+                v:_handler(request.Request:new(), response.Response:new(), args)
             else
                 ngx.exit(500)
             end
