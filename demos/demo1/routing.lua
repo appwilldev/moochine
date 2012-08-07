@@ -9,7 +9,7 @@ mch_router=require 'mch.router'
 mch_router.setup()
 
 
-__logger:log("DEBUG","haha")
+logger:log("DEBUG","haha")
 
 -----------------------------------------------
 -- 1.simple function mapping
