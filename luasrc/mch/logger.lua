@@ -35,7 +35,7 @@ function get_logger(appname)
     if log_config and type(log_config.file) == "string" then
         filename = log_config.file
     end
-    ngx.log(ngx.ERROR,"===="..filename)
+    
     if log_config and type(log_config.level) == "string" then
         level = log_config.level
     end
@@ -73,11 +73,12 @@ function get_logger(appname)
                         _logger:_log("ERROR", "Can not setLevel")
                     end
     -- for _, l in ipairs(logging.LEVEL) do -- logging does not export this variable :(
-    local levels = {"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
-    for _, l in ipairs(levels) do
-        logger[string.lower(l)]=function(self, ...)
-                                    logger.log(self, l, ...)
-                                end
+    local levels = {d = "DEBUG", i = "INFO", w = "WARN", e = "ERROR", f = "FATAL"}
+    for k, l in ipairs(levels) do
+        logger[k] = function(self, ...)
+                        logger.log(self, l, ...)
+                    end
+        logger[string.lower(l)] = logger[k]
     end
     
     return logger
