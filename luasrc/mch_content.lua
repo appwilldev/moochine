@@ -95,7 +95,7 @@ function setup_app()
 end
 
 function content()
-    if not is_inited(ngx.var.MOOCHINE_APP_NAME) then
+    if (not is_inited(ngx.var.MOOCHINE_APP_NAME)) or (not package.loaded.mch) then
         local ok, ret = pcall(setup_app)
         if not ok then
             ngx.status = 500
