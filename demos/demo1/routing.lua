@@ -5,15 +5,17 @@
 --
 
 
-mch_router=require 'mch.router'
+mch_router=require('mch.router')
 mch_router.setup()
 
 
-logger:log("DEBUG","haha")
+logger:error("haha")
 
 -----------------------------------------------
 -- 1.simple function mapping
 map('^/1/hello%?name=(.*)',"d1_test.hello")
+
+-- map('^/1/NO_hello%?name=(.*)',"no_exist.hello")
 
 if get_config("ltp") then
     map('^/1/ltp$',"d1_test.ltp")

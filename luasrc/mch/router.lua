@@ -34,12 +34,19 @@ function route_sorter(luri, ruri)
     end
 end
 
-function map(route_table, route_order, uri, func_name)
+function _map(route_table, route_order, uri, func_name)
     local mod, fn = string.match(func_name, '^(.+)%.([^.]+)$')
     mod = require(mod)
     route_table[uri] = mod[fn]
     table.insert(route_order, uri)
     -- table.sort(route_order, route_sorter) -- sort when merge!
+end
+
+function map(route_table, route_order, uri, func_name)
+    local ret, err = pcall(_map, route_table, route_order, uri, func_name)
+    if not ret then
+        logger:error("URL Mapping Error:[" .. uri .. "=>" .. func_name .. "]" .. err)
+    end
 end
 
 
@@ -63,10 +70,13 @@ function setup()
         mch.vars.get(app_name,"ROUTE_INFO")['ROUTE_ORDER']
     )
         
-    mch.vars.get(app_name,"ROUTE_INFO")['get_config'] = mch.functional.curry(
-        mch.util.get_config,
-        getfenv(2).__CURRENT_APP_NAME__
-    )
+    -- mch.vars.get(app_name,"ROUTE_INFO")['get_config'] = mch.functional.curry(
+    --    mch.util.get_config,
+    --    getfenv(2).__CURRENT_APP_NAME__
+    -- )
+
+    mch.vars.get(app_name,"ROUTE_INFO")['get_config'] = mch.util.get_config
+        
     setfenv(2, mch.vars.get(app_name, "ROUTE_INFO"))
 end
 

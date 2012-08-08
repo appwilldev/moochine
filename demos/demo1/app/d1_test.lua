@@ -8,6 +8,7 @@
 module("d1_test",package.seeall)
 
 local JSON = require("cjson")
+local mchutil = require("mch.util")
 
 function hello(req, resp, name)
     if req.method=='GET' then
@@ -27,7 +28,13 @@ end
 
 function ltp(req,resp,...)
     -- resp:write(1+"a")
-    __logger:log("DEBUG", "hahaha")
+    local issub, name = mchutil.is_subapp()
+    logger:debug("ltp")
+    if issub then
+        resp:writeln("subapp:" .. name)
+    else
+        resp:writeln("mainapp")
+    end
     resp:ltp('d1_ltp.html',{v=111})
 end
 

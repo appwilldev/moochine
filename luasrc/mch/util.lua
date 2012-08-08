@@ -19,7 +19,7 @@
 --
 
 
-module('mch.util',package.seeall)
+module('mch.util', package.seeall)
 
 local mchvars=require("mch.vars")
 
@@ -54,21 +54,21 @@ function loadvars(file)
     return env
 end
 
-function get_config(appname, key)
+function get_config(key)
+    if key == nil then return nil end
+    local issub, subname = is_subapp(3)
     
-    if key == nil then
-        key = appname
-        appname = ngx.var.MOOCHINE_APP_NAME
-    end
-    if appname == ngx.var.MOOCHINE_APP_NAME then
+    if not issub then -- main app
         local ret = ngx.var[key]
         if ret then return ret end
         local app_conf=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG")
         return app_conf[key]
     end
-    
+
+    -- sub app
+    if not subname then return nil end
     local subapps=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG").subapps or {}
-    local subconfig=subapps[appname].config or {}
+    local subconfig=subapps[subname].config or {}
     return subconfig[key]
     
 end
@@ -106,3 +106,23 @@ function table_real_length(t)
     end
     return count
 end
+
+function is_subapp(__call_frame_level)
+    if not __call_frame_level then __call_frame_level = 2 end
+    local caller = debug.getinfo(__call_frame_level,'S').source
+    local main_app = ngx.var.MOOCHINE_APP_PATH
+    
+    local is_mainapp = (main_app == (string.sub(caller, 2, #main_app+1)))
+    if is_mainapp then return false, nil end -- main app
+    
+    local subapps=mchvars.get(ngx.var.MOOCHINE_APP_NAME, "APP_CONFIG").subapps or {}
+    for k, v in pairs(subapps) do
+        local spath = v.path
+        local is_this_subapp = (spath == (string.sub(caller, 2, #spath+1)))
+        if is_this_subapp then return true, k end -- sub app
+    end
+    
+    return false, nil -- not main/sub app, maybe call in moochine!
+end
+
+

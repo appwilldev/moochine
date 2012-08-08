@@ -5,7 +5,7 @@ ltp=true
 
 logger = {
     file = "/tmp/moochine_demo1.log",
-    level = "ERROR",
+    level = "DEBUG",
 }
 
 debug={
@@ -18,8 +18,7 @@ config={
 }
 
 subapps={
-    demo3 = {
-        
+    demo3 = {        
         path="/Volumes/KDr2/Work/appwill/moochine/demos/demo3",
         config={
             test="a test config",

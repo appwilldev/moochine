@@ -30,7 +30,8 @@ function get_logger(appname)
     
     local filename = "/dev/stderr"
     local level = "DEBUG"
-    local log_config = mchutil.get_config(appname, "logger")
+    -- local log_config = mchutil.get_config(appname, "logger")
+    local log_config = mchutil.get_config("logger")
     
     if log_config and type(log_config.file) == "string" then
         filename = log_config.file

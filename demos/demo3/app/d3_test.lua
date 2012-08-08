@@ -7,6 +7,7 @@
 
 module("d3_test",package.seeall)
 
+local mchutil = require("mch.util")
 local JSON = require("cjson")
 
 function hello(req, resp, name)
@@ -26,6 +27,12 @@ end
 
 
 function ltp(req,resp,...)
+    local issub, name = mchutil.is_subapp()
+    if issub then
+        resp:writeln("subapp:" .. name)
+    else
+        resp:writeln("mainapp")
+    end
     resp:ltp('d3_ltp.html',{v=333})
 end
 
