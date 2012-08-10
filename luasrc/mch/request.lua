@@ -49,6 +49,21 @@ function Request:new()
     return ret
 end
 
+function Request:get_uri_arg(name)
+    if name==nil then return nil end
+
+    local arg = self.uri_args[name]
+    if type(arg)=='table' then
+        if #arg>0 then
+            return arg[1]
+        else
+            return ""
+        end
+    end
+
+    return arg
+end
+
 function Request:read_body()
     ngx.req.read_body()
     self['post_args']=ngx.req.get_post_args()
