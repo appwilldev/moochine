@@ -20,6 +20,8 @@
 
 module('mch.request',package.seeall)
 
+local string_len = string.len
+
 Request={}
 
 function Request:new()
@@ -49,19 +51,25 @@ function Request:new()
     return ret
 end
 
-function Request:get_uri_arg(name)
+function Request:get_uri_arg(name, default)
     if name==nil then return nil end
 
     local arg = self.uri_args[name]
-    if type(arg)=='table' then
-        if #arg>0 then
-            return arg[1]
-        else
+    if arg~=nil then
+        if type(arg)=='table' then
+            for _, v in ipairs(arg) do
+                if v and string_len(v)>0 then
+                    return v
+                end
+            end
+
             return ""
         end
+
+        return arg
     end
 
-    return arg
+    return default
 end
 
 function Request:read_body()
