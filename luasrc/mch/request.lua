@@ -20,6 +20,8 @@
 
 module('mch.request',package.seeall)
 
+local string_len = string.len
+
 Request={}
 
 function Request:new()
@@ -49,9 +51,56 @@ function Request:new()
     return ret
 end
 
+function Request:get_uri_arg(name, default)
+    if name==nil then return nil end
+
+    local arg = self.uri_args[name]
+    if arg~=nil then
+        if type(arg)=='table' then
+            for _, v in ipairs(arg) do
+                if v and string_len(v)>0 then
+                    return v
+                end
+            end
+
+            return ""
+        end
+
+        return arg
+    end
+
+    return default
+end
+
+function Request:get_post_arg(name, default)
+    if name==nil then return nil end
+    if self.post_args==nil then return nil end
+
+    local arg = self.post_args[name]
+    if arg~=nil then
+        if type(arg)=='table' then
+            for _, v in ipairs(arg) do
+                if v and string_len(v)>0 then
+                    return v
+                end
+            end
+
+            return ""
+        end
+
+        return arg
+    end
+
+    return default
+end
+
+function Request:get_arg(name, default)
+    return self:get_post_arg(name, default) or self:get_uri_arg(name, default)
+end
+
 function Request:read_body()
     ngx.req.read_body()
-    self['post_args']=ngx.req.get_post_args()
+    self.post_args=ngx.req.get_post_args()
 end
 
 function Request:get_cookie(key, decrypt)
