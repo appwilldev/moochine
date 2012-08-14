@@ -48,7 +48,7 @@ function setup_app()
     local app_name = ngx.var.MOOCHINE_APP_NAME
     local app_path = ngx.var.MOOCHINE_APP_PATH
     local app_config = app_path .. "/application.lua"
-    
+
     package.path = mch_home .. '/luasrc/?.lua;' .. package.path
     mch_vars = require("mch.vars")
     mch_debug = require("mch.debug")
@@ -95,7 +95,7 @@ function setup_app()
 end
 
 function content()
-    if (not is_inited(ngx.var.MOOCHINE_APP_NAME)) or (not package.loaded.mch) then
+    if (not is_inited(ngx.var.MOOCHINE_APP_NAME)) or (not package.loaded["mch.vars"]) then
         local ok, ret = pcall(setup_app)
         if not ok then
             ngx.status = 500
@@ -108,8 +108,9 @@ function content()
     end
     
     if not is_inited(ngx.var.MOOCHINE_APP_NAME) then
-        ngx.say('Can not setup MOOCHINE APP' .. ngx.var.MOOCHINE_APP_NAME)
-        ngx.exit(501)
+        ngx.status=501
+        ngx.say('Can not setup MOOCHINE APP ' .. ngx.var.MOOCHINE_APP_NAME)
+        return
     end
     local uri = ngx.var.REQUEST_URI
     local route_map = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
