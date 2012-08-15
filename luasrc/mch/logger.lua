@@ -52,6 +52,7 @@ function get_logger(appname)
         local frame = debug.getinfo(4)
         local s = string.format('[%s] [%s] [%s:%d] %s\n',
                                 date, level,
+                                frame.short_src,
                                 frame.currentline,
                                 message)
         f:write(s)
