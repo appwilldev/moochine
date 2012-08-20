@@ -10,19 +10,32 @@ Download
 ------------------
 git clone git://github.com/appwilldev/moochine.git
 
+Changlog
+------------------
+
+v0.3
+~~~~~~~~~~~~~~~~~~
+
+* move `routing.lua` from app directory to app root directory
+* `application.lua` for app config (in app root directory)  
+* Multi-App support
+* Sub-App support
+* Facilities of logger and debug
+  
 How to use
 -----------------
 
 * Install ngx-openresty
 * Checkout moochine source, place it to somewhere, suppose to /path/to/machine below
-* There's a demo-app lies under the dir ``/path/to/moochine/demo``, you can run and test
-  it after modifying these file:
+* There's some demo-apps under the dir ``/path/to/moochine/demos``, you can run and test
+  them after modifying these file:
   
-  * demo/conf/nginx.conf (the nginx config file, you need change the MOOCHINE_HOME and
-    MOOCHINE_APP var)
+  * demo1/nginx_runtime/conf/nginx.conf (the nginx config file, you need change the MOOCHINE_HOME and
+    MOOCHINE_APP_NAME var and MOOCHINE_APP_PATH var)
     
-  * demo/app/routing.lua (url map using lua's ``string.match``)
-  * demo/templates/* (`ltp templates <http://www.savarese.com/software/ltp/>`_)
+  * demo1/routing.lua (url map using lua's ``string.match``)
+  * demo1/application.lua (moochine app config file)
+  * demo1/templates/* (`ltp templates <http://www.savarese.com/software/ltp/>`_)
 
 
 Demo
