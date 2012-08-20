@@ -113,8 +113,16 @@ function Response:debug()
 end
 
 function Response:error(info)
-    ngx.status=500
-    self:write({"ERROR: \r\n", info, "\r\n"})
+    if self._eof==true then
+        ngx.log(ngx.ERR, "Moochine ERROR:\r\n", info, "\r\n")
+    else
+        ngx.status=500
+        self:write({"Moochine ERROR:\r\n", info, "\r\n"})
+    end
+end
+
+function Response:is_finished()
+    return self._eof
 end
 
 function Response:finish()
