@@ -38,7 +38,8 @@ function Response:new()
     local ret={
         headers=ngx.header,
         _cookies={},
-        _output={}
+        _output={},
+        _eof=false
     }
     setmetatable(ret,self)
     self.__index=self
@@ -46,10 +47,20 @@ function Response:new()
 end
 
 function Response:write(content)
+    if self._eof==true then
+        ngx.log(ngx.ERR, "Moochine WARNING: The response has been explicitly finished before.")
+        return
+    end
+
     table_insert(self._output,content)
 end
 
 function Response:writeln(content)
+    if self._eof==true then
+        ngx.log(ngx.ERR, "Moochine WARNING: The response has been explicitly finished before.")
+        return
+    end
+
     table_insert(self._output,content)
     table_insert(self._output,"\r\n")
 end
@@ -59,7 +70,6 @@ function Response:redirect(url, status)
 end
 
 function Response:_set_cookie(key, value, encrypt, duration, path)
-
     if not value then return nil end
     
     if not key or key=="" or not value then
@@ -95,7 +105,7 @@ function Response:debug()
     local target="ngx.log"
     if debug_conf and type(debug_conf)=="table" then target = debug_conf.to or target end
     if target == "response" then
-        table_insert(self._output,mchdebug.debug_info2html())
+        self:write(mchdebug.debug_info2html())
     elseif target== "ngx.log" then
         ngx.log(ngx.DEBUG, mchdebug.debug_info2text())
     end
@@ -104,15 +114,23 @@ end
 
 function Response:error(info)
     ngx.status=500
-    table_insert(self._output,"ERROR: \r\n" .. info .. "\r\n")
+    self:write({"ERROR: \r\n", info, "\r\n"})
 end
 
 function Response:finish()
+    if self._eof==true then
+        return
+    end
+
     local debug_conf=mchutil.get_config("debug")
     if debug_conf and type(debug_conf)=="table" and debug_conf.on then
         self:debug()
     end
+
+    self._eof = true
     ngx.print(self._output)
+    self._output = nil
+    ngx.eof()
 end
 
 
@@ -147,6 +165,6 @@ function Response:ltp(template,data)
     local mt={__index=_G}
     setmetatable(data,mt)
     ltp.execute_template(rfun, data, output)
-    table_insert(self._output,output)
+    self:write(output)
 end
 
