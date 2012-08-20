@@ -10,7 +10,7 @@ Download
 ------------------
 git clone git://github.com/appwilldev/moochine.git
 
-Changlog
+Changelog
 ------------------
 
 v0.3
