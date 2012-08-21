@@ -130,6 +130,7 @@ function content()
                 local ok, ret = pcall(v, request.Request:new(), response, args)
                 if not ok then response:error(ret) end
                 response:finish()
+                response:do_defers()
             elseif type(v) == "table" then
                 v:_handler(request.Request:new(), response.Response:new(), args)
             else

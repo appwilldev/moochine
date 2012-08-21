@@ -136,6 +136,7 @@ function Controller:_handler(request,response,...)
         end)
     if not ok then response:error(ret) end
     response:finish()
+    response:do_defers()
 end
 
 

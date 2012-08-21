@@ -39,12 +39,28 @@ function Response:new()
         headers=ngx.header,
         _cookies={},
         _output={},
+        _defer={},
         _eof=false
     }
     setmetatable(ret,self)
     self.__index=self
     return ret
 end
+
+function Response:defer(func, ...)
+    table_insert(self._defer, functional.curry(func, ...))
+end
+
+function Response:do_defers(func, ...)
+    if self._eof==true then
+        for _, f in ipairs(self._defer) do
+            f()
+        end
+    else
+        ngx.log(ngx.ERR, "response is not finished")
+    end
+end
+
 
 function Response:write(content)
     if self._eof==true then

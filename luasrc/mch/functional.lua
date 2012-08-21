@@ -27,6 +27,7 @@ module('mch.functional',package.seeall)
 
 
 function curry(func, ...)
+    if select("#", ...) == 0 then return func end
     local args={...}
     local function inner(...)
         local _args={...}

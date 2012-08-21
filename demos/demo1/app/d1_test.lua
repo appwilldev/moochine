@@ -30,12 +30,19 @@ function ltp(req,resp,...)
     -- resp:write(1+"a")
     local issub, name = mchutil.is_subapp()
     logger:debug("ltp")
+    resp:defer(function(n)
+                   for i = 1, n do
+                       logger:debug("num in defer: " .. tostring(i))
+                       ngx.sleep(1)
+                   end
+               end, 100)
     if issub then
         resp:writeln("subapp:" .. name)
     else
         resp:writeln("mainapp")
     end
     resp:ltp('d1_ltp.html',{v=111})
+    logger:debug("response will be finished after this log")
 end
 
 
