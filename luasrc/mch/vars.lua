@@ -68,6 +68,7 @@ function make_table_perapp(tbl)
             
     local function _get(t, k)
         local data = _perapp_data(t)
+        if k == "__table" then return data end
         return data[k]
     end
 
@@ -79,4 +80,7 @@ function make_table_perapp(tbl)
     setmetatable(tbl, {__index = _get, __newindex = _set})
 end
 
-
+function clear_table_perapp(tbl)
+    if type(tbl) ~= "table" then return end
+    rawset(tbl, ngx.var.MOOCHINE_APP_NAME, {})
+end
