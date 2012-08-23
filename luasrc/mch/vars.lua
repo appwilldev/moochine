@@ -54,3 +54,29 @@ end
 set, get, vars = _setup()
 
 
+function make_table_perapp(tbl)
+    if type(tbl) ~= "table" then return end
+    
+    local function _perapp_data(t)
+        local data = rawget(t, ngx.var.MOOCHINE_APP_NAME)
+        if not data then
+            data = {}
+            rawset(t, ngx.var.MOOCHINE_APP_NAME, data)
+        end
+        return data
+    end
+            
+    local function _get(t, k)
+        local data = _perapp_data(t)
+        return data[k]
+    end
+
+    local function _set(t, k, v)
+        local data = _perapp_data(t)
+        data[k]=v
+    end
+
+    setmetatable(tbl, {__index = _get, __newindex = _set})
+end
+
+
