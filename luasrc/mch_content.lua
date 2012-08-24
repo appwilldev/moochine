@@ -124,15 +124,20 @@ function content()
             local v = route_map[k]
             local request = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
             local response = mch_vars.get(ngx.var.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
-            if type(v) == "function" then
-                local response = response.Response:new()
+
+            local requ = request.Request:new()
+            local resp = response.Response:new()
+            ngx.ctx.response = resp
+            ngx.ctx.request = requ
+            
+            if type(v) == "function" then                
                 if mch_debug then mch_debug.debug_clear() end
-                local ok, ret = pcall(v, request.Request:new(), response, args)
-                if not ok then response:error(ret) end
-                response:finish()
-                response:do_defers()
+                local ok, ret = pcall(v, requ, resp, args)
+                if not ok then resp:error(ret) end
+                resp:finish()
+                resp:do_defers()
             elseif type(v) == "table" then
-                v:_handler(request.Request:new(), response.Response:new(), args)
+                v:_handler(requ, resp, args)
             else
                 ngx.exit(500)
             end
