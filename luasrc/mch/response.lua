@@ -153,6 +153,7 @@ function Response:finish()
 
     self._eof = true
     ngx.print(self._output)
+    ngx.flush(true)
     self._output = nil
     ngx.eof()
 end
