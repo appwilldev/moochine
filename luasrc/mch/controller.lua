@@ -124,14 +124,12 @@ function Controller:_handler(request,response,...)
     mchdebug.debug_clear()
     local ok, ret=pcall(
         function()
-            for i=1,1 do
-                if type(handler)=="function" then
-                    ctller:before(request,response)
-                    if ctller.finished==true then break end
-                    handler(ctller,request,response,unpack(args))
-                    if ctller.finished==true then break end
-                    ctller:after(request,response)
-                end
+            if type(handler)=="function" then
+                ctller:before(request,response)
+                if ctller.finished==true then return end
+                handler(ctller,request,response,unpack(args))
+                if ctller.finished==true then return end
+                ctller:after(request,response)
             end
         end)
     if not ok then response:error(ret) end
