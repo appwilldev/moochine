@@ -43,7 +43,8 @@ function get_logger(appname)
 
     local f = io.open(filename, "a")
     if not f then
-        return nil, string.format("file `%s' could not be opened for writing", filename)
+        f = io.open("/dev/stderr", "a")
+        ngx.log(ngx.ERR, string.format("LOGGER ERROR: file `%s' could not be opened for writing", filename))
     end
     f:setvbuf("line")
 
