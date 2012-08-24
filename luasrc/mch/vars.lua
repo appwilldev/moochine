@@ -84,3 +84,11 @@ function clear_table_perapp(tbl)
     if type(tbl) ~= "table" then return end
     rawset(tbl, ngx.var.MOOCHINE_APP_NAME, {})
 end
+
+function apairs(tbl)
+    if type(tbl) ~= "table" then return end
+    if tbl.__table then return pairs(tbl.__table) end
+    return pairs(tbl)
+end
+
+
