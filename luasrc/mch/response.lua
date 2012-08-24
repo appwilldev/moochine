@@ -153,9 +153,11 @@ function Response:finish()
 
     self._eof = true
     ngx.print(self._output)
-    ngx.flush(true)
     self._output = nil
-    ngx.eof()
+    local ok, ret = pcall(ngx.eof)
+    if not ok then
+        ngx.log(ngx.ERR, "ngx.eof() error:", ret)
+    end
 end
 
 
