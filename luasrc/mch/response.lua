@@ -93,7 +93,7 @@ function Response:_set_cookie(key, value, encrypt, duration, path)
     end
 
     if not duration or duration<=0 then
-        duration=86400
+        duration=604800 -- 7 days, 7*24*60*60 seconds
     end
 
     if not path or path=="" then
