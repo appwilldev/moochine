@@ -120,7 +120,8 @@ function Response:debug()
     local debug_conf=mchutil.get_config("debug")
     local target="ngx.log"
     if debug_conf and type(debug_conf)=="table" then target = debug_conf.to or target end
-    if target == "response" then
+    if target == "response" and string.match(self.headers['Content-Type'] or '', '^text/.*html') then
+        -- seems to be no way to get default_type?
         self:write(mchdebug.debug_info2html())
     elseif target== "ngx.log" then
         ngx.log(ngx.DEBUG, mchdebug.debug_info2text())
@@ -133,6 +134,7 @@ function Response:error(info)
         ngx.log(ngx.ERR, "Moochine ERROR:\r\n", info, "\r\n")
     else
         ngx.status=500
+        self.headers['Content-Type'] = 'text/html; charset=utf-8'
         self:write({"Moochine ERROR:\r\n", info, "\r\n"})
     end
 end
