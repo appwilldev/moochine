@@ -9,6 +9,7 @@
 -------------------------------------------------------------------------------
 
 local type, table, string, _tostring, tonumber = type, table, string, tostring, tonumber
+local unpack = unpack
 local select = select
 local error = error
 local format = string.format
@@ -48,12 +49,32 @@ for i=1,MAX_LEVELS do
 	LEVEL[LEVEL[i]] = i
 end
 
+function cleverformat(fmt, ...)
+  local args = {...}
+  local pos = 0
+  local newarg = {}
+  local newfmt = string.gsub(fmt, '%%s?', function(spec)
+    pos = pos + 1
+    if spec == '%s' then
+      return string.gsub(tostring(args[pos]), '%%', '%%%%')
+    else
+      table.insert(newarg, args[pos])
+      return '%'
+    end
+  end)
+  if #newarg > 0 then
+    return format(newfmt, unpack(newarg))
+  else
+    return newfmt
+  end
+end
+
 -- private log function, with support for formating a complex log message.
 local function LOG_MSG(self, level, fmt, ...)
 	local f_type = type(fmt)
 	if f_type == 'string' then
 		if select('#', ...) > 0 then
-			return self:append(level, format(fmt, ...))
+			return self:append(level, cleverformat(fmt, ...))
 		else
 			-- only a single string, no formating needed.
 			return self:append(level, fmt)
@@ -171,7 +192,7 @@ function tostring(value, visited)
 
   if (type(value) ~= 'table') then
     if (type(value) == 'string') then
-      str = string.format("%q", value)
+      str = format("%q", value)
     else
       str = _tostring(value)
     end
