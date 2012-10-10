@@ -61,13 +61,13 @@ function get_config(key, default)
     if not issub then -- main app
         local ret = ngx.var[key]
         if ret then return ret end
-        local app_conf=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG")
+        local app_conf=mchvars.get(ngx.ctx.MOOCHINE_APP_NAME,"APP_CONFIG")
         return app_conf[key] or default
     end
 
     -- sub app
     if not subname then return default end
-    local subapps=mchvars.get(ngx.var.MOOCHINE_APP_NAME,"APP_CONFIG").subapps or {}
+    local subapps=mchvars.get(ngx.ctx.MOOCHINE_APP_NAME,"APP_CONFIG").subapps or {}
     local subconfig=subapps[subname].config or {}
     return subconfig[key] or default
     
@@ -115,7 +115,7 @@ function is_subapp(__call_frame_level)
     local is_mainapp = (main_app == (string.sub(caller, 2, #main_app+1)))
     if is_mainapp then return false, nil end -- main app
     
-    local subapps = mchvars.get(ngx.var.MOOCHINE_APP_NAME, "APP_CONFIG").subapps or {}
+    local subapps = mchvars.get(ngx.ctx.MOOCHINE_APP_NAME, "APP_CONFIG").subapps or {}
     for k, v in pairs(subapps) do
         local spath = v.path
         local is_this_subapp = (spath == (string.sub(caller, 2, #spath+1)))

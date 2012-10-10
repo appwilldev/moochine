@@ -181,7 +181,7 @@ function ltp_function(template)
                        d=mchutil.read_all(v.path .. "/templates/" .. template)
                        if d then return d end
                    end
-               end)(ngx.var.MOOCHINE_APP_NAME)
+               end)(ngx.ctx.MOOCHINE_APP_NAME)
     end
     local rfun = ltp.load_template(tdata, '<?lua','?>')
     ltp_templates_cache[template]=rfun

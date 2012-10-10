@@ -58,10 +58,10 @@ function make_table_perapp(tbl)
     if type(tbl) ~= "table" then return end
     
     local function _perapp_data(t)
-        local data = rawget(t, ngx.var.MOOCHINE_APP_NAME)
+        local data = rawget(t, ngx.ctx.MOOCHINE_APP_NAME)
         if not data then
             data = {}
-            rawset(t, ngx.var.MOOCHINE_APP_NAME, data)
+            rawset(t, ngx.ctx.MOOCHINE_APP_NAME, data)
         end
         return data
     end
@@ -82,7 +82,7 @@ end
 
 function clear_table_perapp(tbl)
     if type(tbl) ~= "table" then return end
-    rawset(tbl, ngx.var.MOOCHINE_APP_NAME, {})
+    rawset(tbl, ngx.ctx.MOOCHINE_APP_NAME, {})
 end
 
 function apairs(tbl)
@@ -90,5 +90,3 @@ function apairs(tbl)
     if tbl.__table then return pairs(tbl.__table) end
     return pairs(tbl)
 end
-
-

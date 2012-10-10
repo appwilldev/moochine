@@ -67,11 +67,11 @@ function get_logger(appname)
     logger._setLevel = logger.setLevel
 
     logger.log = function(self, level, ...)
-                     local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
+                     local _logger = get_logger(ngx.ctx.MOOCHINE_APP_NAME)
                      _logger._log(self, level, ...)
                  end
     logger.setLevel = function(self, level, ...)
-                          local _logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
+                          local _logger = get_logger(ngx.ctx.MOOCHINE_APP_NAME)
                           _logger:_log("ERROR", "Can not setLevel")
                       end
     -- for _, l in ipairs(logging.LEVEL) do -- logging does not export this variable :(
@@ -89,7 +89,7 @@ function get_logger(appname)
 end
 
 function logger()
-    local logger = get_logger(ngx.var.MOOCHINE_APP_NAME)
+    local logger = get_logger(ngx.ctx.MOOCHINE_APP_NAME)
     return logger
 end
 
