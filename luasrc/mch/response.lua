@@ -54,7 +54,10 @@ end
 function Response:do_defers(func, ...)
     if self._eof==true then
         for _, f in ipairs(self._defer) do
-            f()
+            local ok, err = pcall(f)
+            if not ok then
+              logger:error('Error while doing defers: %s', err)
+            end
         end
     else
         ngx.log(ngx.ERR, "response is not finished")
