@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+# vim:fileencoding=utf-8
+
+import json
+import struct
+
+def parse_netint(b):
+  return struct.unpack('!I', b)[0]
+
+def pack_netint(i):
+  return struct.pack('!I', i)
+
+def recvbytes(sock, length):
+  got = 0
+  data = []
+  while got < length:
+    r = sock.recv(length - got)
+    if not r:
+      return
+    got += len(r)
+    data.append(r)
+  return b''.join(data)
+
+def fromjson(s):
+  return json.loads(s.decode('utf-8'))
+
+def tojson(d):
+  return json.dumps(d, ensure_ascii=False).encode('utf-8')
+
+def write_response(sock, s):
+  if isinstance(s, dict):
+    s = tojson(s)
+  if isinstance(s, str):
+    s = s.encode('utf-8')
+  sock.sendall(pack_netint(len(s)) + s)
+
+def read_response(sock):
+  r = recvbytes(sock, 4)
+  if not r:
+    return
+
+  length = parse_netint(r)
+  data = recvbytes(sock, length)
+  if data is None:
+    raise Exception('client disappeared suddenly')
+  return fromjson(data)
+
+import readline
+import socket
+import urllib.request
+import sys
+
+def setupReadline():
+  import os, atexit
+  historyPath=os.path.expanduser('~/.hdtconsole')
+
+  def save_history():
+    readline.write_history_file(historyPath)
+
+  if os.path.exists(historyPath):
+    readline.read_history_file(historyPath)
+  readline.set_history_length(10000)
+  atexit.register(save_history)
+
+def main():
+  sock = socket.socket()
+  sock.listen(1)
+  res = urllib.request.urlopen('http://localhost:8080/mch/console?port=%d' % sock.getsockname()[1]).read()
+  if res != b'ok.\r\n':
+    sys.exit('Server error: %s' % res)
+  s, a = sock.accept()
+  setupReadline()
+
+  while True:
+    try:
+      cmd = input('hdt> ')
+    except EOFError:
+      print()
+      break
+    if not cmd:
+      continue
+
+    if cmd[0] == '=':
+      cmd = 'return ' + cmd[1:]
+    write_response(s, dict(cmd='code', data=cmd))
+    ans = read_response(s)
+    if not ans:
+      pass
+    elif 'result' in ans:
+      print(ans['result'])
+    elif 'error' in ans:
+      print('Error:', ans['error'])
+    else:
+      print('Response:', ans)
+
+if __name__ == '__main__':
+  try:
+    main()
+  except KeyboardInterrupt:
+    pass

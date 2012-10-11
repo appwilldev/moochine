@@ -18,10 +18,14 @@
 --
 --
 
+local json = require("cjson")
+local floor = math.floor
+local strchar = string.char
+local strbyte = string.byte
+
+local mchvars = require("mch.vars")
 
 module('mch.util', package.seeall)
-
-local mchvars=require("mch.vars")
 
 function read_all(filename)
     local file = io.open(filename, "r")
@@ -125,4 +129,42 @@ function is_subapp(__call_frame_level)
     return false, nil -- not main/sub app, maybe call in moochine!
 end
 
+function parseNetInt(bytes)
+    local a, b, c, d = strbyte(bytes, 1, 4)
+    return a * 256 ^ 3 + b * 256 ^ 2 + c * 256 + d
+end
 
+function toNetInt(n)
+    -- NOTE: for little endian machine only!!!
+    local d = n % 256
+    n = floor(n / 256)
+    local c = n % 256
+    n = floor(n / 256)
+    local b = n % 256
+    n = floor(n / 256)
+    local a = n
+    return strchar(a) .. strchar(b) .. strchar(c) .. strchar(d)
+end
+
+function write_jsonresponse(sock, s)
+    if type(s) == 'table' then
+        s = json.encode(s)
+    end
+    local l = toNetInt(#s)
+    sock:send(l .. s)
+end
+
+function read_jsonresponse(sock)
+    local r, err = sock:receive(4)
+    if not r then
+        logger:warn('Error when receiving from socket: %s', err)
+        return
+    end
+    local len = parseNetInt(r)
+    data, err = sock:receive(len)
+    if not data then
+        logger:error('Error when receiving from socket: %s', err)
+        return
+    end
+    return json.decode(data)
+end
