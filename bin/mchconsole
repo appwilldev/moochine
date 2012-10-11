@@ -1,5 +1,21 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # vim:fileencoding=utf-8
+
+from __future__ import print_function
+
+import sys
+
+if sys.version_info[0] == 2:
+  import urllib2
+  urlopen = urllib2.urlopen
+  input = raw_input
+  def b(s):
+    return s
+else:
+  import urllib.request
+  urlopen = urllib.request.urlopen
+  def b(s):
+    return s.encode('ascii')
 
 import json
 import struct
@@ -19,7 +35,7 @@ def recvbytes(sock, length):
       return
     got += len(r)
     data.append(r)
-  return b''.join(data)
+  return b('').join(data)
 
 def fromjson(s):
   return json.loads(s.decode('utf-8'))
@@ -47,8 +63,6 @@ def read_response(sock):
 
 import readline
 import socket
-import urllib.request
-import sys
 
 def setupReadline():
   import os, atexit
@@ -65,8 +79,8 @@ def setupReadline():
 def main():
   sock = socket.socket()
   sock.listen(1)
-  res = urllib.request.urlopen('http://localhost:8080/mch/console?port=%d' % sock.getsockname()[1]).read()
-  if res != b'ok.\r\n':
+  res = urlopen('http://localhost:8080/mch/console?port=%d' % sock.getsockname()[1]).read()
+  if res != b('ok.\r\n'):
     sys.exit('Server error: %s' % res)
   s, a = sock.accept()
   setupReadline()
