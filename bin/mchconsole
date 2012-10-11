@@ -11,11 +11,16 @@ if sys.version_info[0] == 2:
   input = raw_input
   def b(s):
     return s
+  tobytes = frombytes = b
 else:
   import urllib.request
   urlopen = urllib.request.urlopen
   def b(s):
     return s.encode('ascii')
+  def tobytes(s):
+    return s.encode('utf-8')
+  def frombytes(s):
+    return s.decode('utf-8')
 
 import json
 import struct
@@ -38,16 +43,16 @@ def recvbytes(sock, length):
   return b('').join(data)
 
 def fromjson(s):
-  return json.loads(s.decode('utf-8'))
+  return json.loads(frombytes(s))
 
 def tojson(d):
-  return json.dumps(d, ensure_ascii=False).encode('utf-8')
+  return tobytes(json.dumps(d, ensure_ascii=False))
 
 def write_response(sock, s):
   if isinstance(s, dict):
     s = tojson(s)
   if isinstance(s, str):
-    s = s.encode('utf-8')
+    s = tobytes(s)
   sock.sendall(pack_netint(len(s)) + s)
 
 def read_response(sock):
