@@ -7,6 +7,7 @@ import sys
 
 if sys.version_info[0] == 2:
   import urllib2
+  from urllib2 import quote as URIescape
   urlopen = urllib2.urlopen
   input = raw_input
   def b(s):
@@ -14,6 +15,7 @@ if sys.version_info[0] == 2:
   tobytes = frombytes = b
 else:
   import urllib.request
+  from urllib.parse import quote as URIescape
   urlopen = urllib.request.urlopen
   def b(s):
     return s.encode('ascii')
@@ -81,10 +83,14 @@ def setupReadline():
   readline.set_history_length(10000)
   atexit.register(save_history)
 
-def main():
+def main(url, host=None):
   sock = socket.socket()
   sock.listen(1)
-  res = urlopen('http://localhost:8080/mch/console?port=%d' % sock.getsockname()[1]).read()
+  url = url + '?port=%d' % sock.getsockname()[1]
+  if host:
+    url += '&host=' + URIescape(host)
+
+  res = urlopen(url).read()
   if res != b('ok.\r\n'):
     sys.exit('Server error: %s' % res)
   s, a = sock.accept()
@@ -113,7 +119,13 @@ def main():
       print('Response:', ans)
 
 if __name__ == '__main__':
+  import argparse
+  parser = argparse.ArgumentParser(description='connect to moochine remote Lua console.')
+  parser.add_argument('URL', help='url to start the Lua console')
+  parser.add_argument('--host', default=None, help='my own IP for Lua to connect back')
+  args = parser.parse_args()
+
   try:
-    main()
+    main(args.URL, args.host)
   except KeyboardInterrupt:
     pass
