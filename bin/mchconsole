@@ -108,7 +108,7 @@ class RemoteLuaCompleter(object):
 
 def setupReadline(sock):
   import os, atexit
-  historyPath=os.path.expanduser('~/.hdtconsole')
+  historyPath=os.path.expanduser('~/.mchconsole')
 
   def save_history():
     readline.write_history_file(historyPath)
@@ -136,7 +136,7 @@ def main(url, host=None):
 
   while True:
     try:
-      cmd = input('hdt> ')
+      cmd = input('mch> ')
     except EOFError:
       print()
       break
