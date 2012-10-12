@@ -39,9 +39,30 @@ function interact(host, port)
           end
         end
       end
+    elseif req.cmd == 'dir' then
+      local t = {}
+      local o
+      local chunk, ok, ret
+      chunk, _ = loadstring('return ' .. req.data, 'input')
+      if chunk then
+        ok, ret = pcall(chunk)
+        if ok then
+          o = ret
+        end
+      end
+      for i, j in pairs(o) do
+        if type(i) == 'string' then
+          if type(j) == 'function' then
+            i = i .. '('
+          end
+          table.insert(t, i)
+        end
+      end
+      res.result = t
     else
       res.error = 'unknown cmd: ' .. logger.tostring(req.cmd)
     end
+    logger:info('reply: %s', res)
     utils.write_jsonresponse(sock, res)
   end
   logger:info('console session ends.')
