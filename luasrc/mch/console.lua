@@ -50,12 +50,14 @@ function interact(host, port)
           o = ret
         end
       end
-      for i, j in pairs(o) do
-        if type(i) == 'string' then
-          if type(j) == 'function' then
-            i = i .. '('
+      if o then
+        for i, j in pairs(o) do
+          if type(i) == 'string' then
+            if type(j) == 'function' then
+              i = i .. '('
+            end
+            table.insert(t, i)
           end
-          table.insert(t, i)
         end
       end
       res.result = t
