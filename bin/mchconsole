@@ -166,4 +166,4 @@ if __name__ == '__main__':
   try:
     main(args.URL, args.host)
   except KeyboardInterrupt:
-    pass
+    print()
