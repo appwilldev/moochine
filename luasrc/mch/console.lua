@@ -2,6 +2,34 @@ local utils = require("mch.util")
 
 module('mch.console', package.seeall)
 
+function getMembers(t, o)
+  local tp
+  for i, j in pairs(o) do
+    if type(i) == 'string' then
+      if type(j) == 'function' then
+        tp = true
+      else
+        tp = false
+      end
+      t[i] = tp
+    end
+  end
+  return t
+end
+
+function table2array(t, funcOnly)
+  local ret = {}
+  for k, v in pairs(t) do
+    if v then
+      table.insert(ret, k .. '(')
+    elseif funcOnly then
+    else
+      table.insert(ret, k)
+    end
+  end
+  return ret
+end
+
 function interact(host, port)
   local sock = ngx.socket.tcp()
   local ok, err
@@ -41,45 +69,24 @@ function interact(host, port)
       end
     elseif req.cmd == 'dir' then
       local t = {}
-      local o = {}
-      local ok, ret
-      if req.data == '_G' then
-        local k = 0
-        while true do
-          ok, ret = pcall(getfenv, k)
-          if ok then
-            for i, j in pairs(ret) do
-              if type(j) == 'function' then
-                i = i .. '('
-              end
-              o[i] = true
-            end
-          else
-            break
-          end
-          k = k + 1
-        end
-      else
-        local chunk
-        chunk, _ = loadstring('return ' .. req.data, 'input')
-        if chunk then
-          ok, ret = pcall(chunk)
-          if ok then
-            o = ret
-          end
+      local o
+      local chunk, ok, ret
+      chunk, _ = loadstring('return ' .. req.data, 'input')
+      if chunk then
+        ok, ret = pcall(chunk)
+        if ok then
+          o = ret
         end
       end
       if o then
-        for i, j in pairs(o) do
-          if type(i) == 'string' then
-            if type(j) == 'function' then
-              i = i .. '('
-            end
-            table.insert(t, i)
-          end
+        getMembers(t, o)
+        local meta = getmetatable(o) or {}
+        if type(meta.__index) == 'table' then
+          getMembers(t, meta.__index)
+          logger:info(t)
         end
       end
-      res.result = t
+      res.result = table2array(t)
     else
       res.error = 'unknown cmd: ' .. logger.tostring(req.cmd)
     end
