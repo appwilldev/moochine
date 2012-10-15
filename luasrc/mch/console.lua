@@ -41,13 +41,32 @@ function interact(host, port)
       end
     elseif req.cmd == 'dir' then
       local t = {}
-      local o
-      local chunk, ok, ret
-      chunk, _ = loadstring('return ' .. req.data, 'input')
-      if chunk then
-        ok, ret = pcall(chunk)
-        if ok then
-          o = ret
+      local o = {}
+      local ok, ret
+      if req.data == '_G' then
+        local k = 0
+        while true do
+          ok, ret = pcall(getfenv, k)
+          if ok then
+            for i, j in pairs(ret) do
+              if type(j) == 'function' then
+                i = i .. '('
+              end
+              o[i] = true
+            end
+          else
+            break
+          end
+          k = k + 1
+        end
+      else
+        local chunk
+        chunk, _ = loadstring('return ' .. req.data, 'input')
+        if chunk then
+          ok, ret = pcall(chunk)
+          if ok then
+            o = ret
+          end
         end
       end
       if o then
