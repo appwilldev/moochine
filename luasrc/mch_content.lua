@@ -114,22 +114,22 @@ function content()
         return
     end
     local uri = ngx.var.REQUEST_URI
-    local route_map = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
+    local route_map   = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
     local route_order = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_ORDER']
-    local page_found = false
+    local page_found  = false
     -- match order by definition order
     for _, k in ipairs(route_order) do
         local args = string.match(uri, k)
         if args then
             page_found = true
             local v = route_map[k]
-            local request = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
+            local request  = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
             local response = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
 
             local requ = request.Request:new()
             local resp = response.Response:new()
+            ngx.ctx.request  = requ
             ngx.ctx.response = resp
-            ngx.ctx.request = requ
             
             if type(v) == "function" then                
                 if mch_debug then mch_debug.debug_clear() end
@@ -137,6 +137,7 @@ function content()
                 if not ok then resp:error(ret) end
                 resp:finish()
                 resp:do_defers()
+                resp:do_last_func()
             elseif type(v) == "table" then
                 v:_handler(requ, resp, args)
             else
