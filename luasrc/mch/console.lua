@@ -83,10 +83,9 @@ function interact(host, port)
         local meta = getmetatable(o) or {}
         if type(meta.__index) == 'table' then
           getMembers(t, meta.__index)
-          logger:info(t)
         end
       end
-      res.result = table2array(t)
+      res.result = table2array(t, req.funcOnly)
     else
       res.error = 'unknown cmd: ' .. logger.tostring(req.cmd)
     end

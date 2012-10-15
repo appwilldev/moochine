@@ -69,6 +69,7 @@ def read_response(sock):
   return fromjson(data)
 
 import readline
+import re
 import socket
 
 class RemoteLuaCompleter(object):
@@ -77,9 +78,12 @@ class RemoteLuaCompleter(object):
 
   def complete(self, text, state):
     if state == 0:
-      if "." in text:
-        self.matches = self.attr_matches(text)
-      else:
+      try:
+        obj, suffix = re.split(r'[.:]', text, 1)
+        self.matches = self.attr_matches(obj, suffix, text[len(obj)] == ':')
+      except ValueError:
+        import traceback
+        traceback.print_exc()
         self.matches = self.global_matches(text)
     try:
       return self.matches[state]
@@ -90,10 +94,13 @@ class RemoteLuaCompleter(object):
     g = self.getNames('_G')
     return self.filterMatches(g, text)
 
-  def attr_matches(self, text):
-    obj, text = text.rsplit('.', 1)
-    attrs = self.getNames(obj)
-    return self.filterMatches(attrs, text, prefix=obj+'.')
+  def attr_matches(self, obj, text, funcOnly):
+    attrs = self.getNames(obj, funcOnly)
+    if funcOnly:
+      prefix = obj + ':'
+    else:
+      prefix = obj + '.'
+    return self.filterMatches(attrs, text, prefix=prefix)
 
   def filterMatches(self, values, text, prefix=None):
     if prefix is None:
@@ -101,8 +108,8 @@ class RemoteLuaCompleter(object):
     else:
       return [prefix + x for x in values if x.startswith(text)]
 
-  def getNames(self, obj):
-    write_response(self.sock, dict(cmd='dir', data=obj))
+  def getNames(self, obj, funcOnly=False):
+    write_response(self.sock, dict(cmd='dir', data=obj, funcOnly=funcOnly))
     ans = read_response(self.sock)
     return ans['result']
 
@@ -118,6 +125,7 @@ def setupReadline(sock):
   readline.set_history_length(10000)
   atexit.register(save_history)
 
+  readline.set_completer_delims(readline.get_completer_delims().replace(':', ''))
   readline.set_completer(RemoteLuaCompleter(sock).complete)
   readline.parse_and_bind("tab: complete")
 
