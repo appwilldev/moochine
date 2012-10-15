@@ -69,8 +69,17 @@ def read_response(sock):
   return fromjson(data)
 
 import readline
-import re
 import socket
+
+def split(text):
+  dot = text.rfind('.')
+  colon = text.rfind(':')
+  if dot > colon:
+    return text[:dot], '.', text[dot+1:]
+  elif colon > dot:
+    return text[:colon], ':', text[colon+1:]
+  else:
+    return text
 
 class RemoteLuaCompleter(object):
   def __init__(self, sock):
@@ -79,8 +88,8 @@ class RemoteLuaCompleter(object):
   def complete(self, text, state):
     if state == 0:
       try:
-        obj, suffix = re.split(r'[.:]', text, 1)
-        self.matches = self.attr_matches(obj, suffix, text[len(obj)] == ':')
+        obj, sep, text = split(text)
+        self.matches = self.attr_matches(obj, text, sep == ':')
       except ValueError:
         self.matches = self.global_matches(text)
     try:
