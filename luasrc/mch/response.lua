@@ -40,6 +40,7 @@ function Response:new()
         _cookies={},
         _output={},
         _defer={},
+        _last_func=nil,
         _eof=false
     }
     setmetatable(ret,self)
@@ -47,23 +48,36 @@ function Response:new()
     return ret
 end
 
+function Response:set_last_func(func, ...)
+    self._last_func = functional.curry(func, ...)
+end
+
+function Response:do_last_func()
+    local last_func = self._last_func
+    if last_func then
+        local ok, err = pcall(last_func)
+        if not ok then
+            logger:error('Error while doing last func: %s', err)
+        end
+    end
+end
+
 function Response:defer(func, ...)
     table_insert(self._defer, functional.curry(func, ...))
 end
 
-function Response:do_defers(func, ...)
+function Response:do_defers()
     if self._eof==true then
         for _, f in ipairs(self._defer) do
             local ok, err = pcall(f)
             if not ok then
-              logger:error('Error while doing defers: %s', err)
+                logger:error('Error while doing defers: %s', err)
             end
         end
     else
         ngx.log(ngx.ERR, "response is not finished")
     end
 end
-
 
 function Response:write(content)
     if self._eof==true then
