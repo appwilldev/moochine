@@ -4,8 +4,10 @@
 -- @author Danilo Tuler (tuler@ideais.com.br)
 -- @author Andre Carregal (info@keplerproject.org)
 -- @author Thiago Costa Ponte (thiago@ideais.com.br)
+-- @author lilydjwg (lilydjwg@gmail.com)
 --
 -- @copyright 2004-2011 Kepler Project
+-- @copyright 2012 lilydjwg
 -------------------------------------------------------------------------------
 
 local type, table, string, _tostring, tonumber = type, table, string, tostring, tonumber
@@ -15,6 +17,7 @@ local error = error
 local format = string.format
 local pcall = pcall
 local getmetatable, rawget = getmetatable, rawget
+local ipairs, pairs = ipairs, pairs
 
 module("logging")
 
@@ -190,36 +193,36 @@ function tostring(value, visited)
     visited[value] = true
   end
 
-  if (type(value) ~= 'table') then
-    if (type(value) == 'string') then
+  if type(value) ~= 'table' then
+    if type(value) == 'string' then
       str = format("%q", value)
     else
       str = _tostring(value)
     end
   else
-    local auxTable = {}
-    table.foreach(value, function(i, v)
-      if (tonumber(i) ~= i) then
-        table.insert(auxTable, i)
-      else
-        table.insert(auxTable, tostring(i, visited))
-      end
-    end)
-    pcall(table.sort, auxTable)
+    local tmp = {}
+    for k, v in ipairs(value) do
+      table.insert(tmp, tostring(v))
+    end
+    str = table.concat(tmp, ', ')
+    local n = #tmp
 
-    str = str..'{'
-    local separator = ""
-    local entry = ""
-    table.foreachi (auxTable, function (i, fieldName)
-      if ((tonumber(fieldName)) and (tonumber(fieldName) > 0)) then
-        entry = tostring(value[tonumber(fieldName)], visited)
-      else
-        entry = tostring(fieldName, visited).." = "..tostring(value[fieldName], visited)
+    tmp = {}
+    for k, v in pairs(value) do
+      if type(k) ~= 'number' or k < 1 or k > n then
+        table.insert(tmp, tostring(k) .. ' = ' .. tostring(v))
       end
-      str = str..separator..entry
-      separator = ", "
-    end)
-    str = str..'}'
+    end
+    if #tmp > 0 then
+      table.sort(tmp)
+      local str2 = table.concat(tmp, ', ')
+      if #str > 1 then
+        str = str .. ', ' .. str2
+      else
+        str = str2
+      end
+    end
+    str = '{' .. str .. '}'
   end
   return str
 end
