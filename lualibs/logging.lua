@@ -202,7 +202,7 @@ function tostring(value, visited)
   else
     local tmp = {}
     for k, v in ipairs(value) do
-      table.insert(tmp, tostring(v))
+      table.insert(tmp, tostring(v, visited))
     end
     str = table.concat(tmp, ', ')
     local n = #tmp
@@ -210,7 +210,7 @@ function tostring(value, visited)
     tmp = {}
     for k, v in pairs(value) do
       if type(k) ~= 'number' or k < 1 or k > n then
-        table.insert(tmp, tostring(k) .. ' = ' .. tostring(v))
+        table.insert(tmp, tostring(k) .. ' = ' .. tostring(v, visited))
       end
     end
     if #tmp > 0 then
