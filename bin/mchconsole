@@ -178,6 +178,7 @@ def main(url, host=None):
   s, a = sock.accept()
   setupReadline(s)
 
+  print(">> Moochine Lua Console. Use ':h' to see available commands <<")
   while True:
     try:
       cmd = input('mch> ')
@@ -201,6 +202,10 @@ def main(url, host=None):
           # Python 3 only; Python 2.7 will pass the binary to server
           print('Error:', 'text encoding is not UTF-8')
           continue
+      elif cmd.strip() == ':h':
+        print(':l FILE\t\tload lua code from file',
+              ':h\t\tdisplay this help', sep='\n')
+        continue
       else:
         print('Error:', 'bad command')
         continue
