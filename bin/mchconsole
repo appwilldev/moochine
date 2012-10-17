@@ -3,6 +3,7 @@
 
 from __future__ import print_function
 
+import os
 import sys
 
 if sys.version_info[0] == 2:
@@ -23,6 +24,11 @@ else:
     return s.encode('utf-8')
   def frombytes(s):
     return s.decode('utf-8')
+
+def expandpath(p):
+  p = os.path.expanduser(p)
+  p = os.path.expandvars(p)
+  return p
 
 import json
 import struct
@@ -87,11 +93,34 @@ class RemoteLuaCompleter(object):
 
   def complete(self, text, state):
     if state == 0:
-      try:
-        obj, sep, text = split(text)
-        self.matches = self.attr_matches(obj, text, sep == ':')
-      except ValueError:
-        self.matches = self.global_matches(text)
+      line = readline.get_line_buffer()
+      if line.startswith(':l '): # load some file
+        try:
+          p = line.split(None, 1)[1]
+        except IndexError:
+          p = ''
+        if p == '~':
+          return '/' if state == 0 else None
+
+        p = expandpath(p)
+        d, f = os.path.split(p)
+        if not d:
+          d = '.'
+        self.matches = m = []
+        stripn = len(f) - len(text)
+        for x in os.listdir(d):
+          if x.startswith(f):
+            if (not f or f[0] != '.') and x[0] == '.':
+              continue
+            if os.path.isdir(os.path.join(d, x)):
+              x += '/'
+            m.append(x[stripn:])
+      else:
+        try:
+          obj, sep, text = split(text)
+          self.matches = self.attr_matches(obj, text, sep == ':')
+        except ValueError:
+          self.matches = self.global_matches(text)
     try:
       return self.matches[state]
     except IndexError:
@@ -158,6 +187,23 @@ def main(url, host=None):
     if not cmd:
       continue
 
+    if cmd[0] == ':':
+      if cmd.startswith(':l '):
+        # let's load some code from file!
+        try:
+          p = cmd.split(None, 1)[1]
+          p = expandpath(p)
+          cmd = open(p).read()
+        except IOError as e:
+          print('Error:', str(e))
+          continue
+        except UnicodeDecodeError:
+          # Python 3 only; Python 2.7 will pass the binary to server
+          print('Error:', 'text encoding is not UTF-8')
+          continue
+      else:
+        print('Error:', 'bad command')
+        continue
     if cmd[0] == '=':
       cmd = 'return ' + cmd[1:]
     write_response(s, dict(cmd='code', data=cmd))
