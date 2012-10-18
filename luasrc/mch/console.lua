@@ -38,12 +38,12 @@ function interact(host, port)
     logger:error('Error while connecting back to %s:%d, %s', host, port, err)
     return
   end
-  logger:info('console socket connected.')
+  logger:debug('console socket connected.')
   sock:settimeout(86400000)
   while true do
     local req = utils.read_jsonresponse(sock)
     local res = {}
-    logger:info('console socket got request: %s', req)
+    logger:debug('console socket got request: %s', req)
     if not req then break end
     local res = {}
     if req.cmd == 'code' then
@@ -78,21 +78,21 @@ function interact(host, port)
           o = ret
         end
       end
-      if o then
+      if type(o) == 'table' then
         getMembers(t, o)
         local meta = getmetatable(o) or {}
         if type(meta.__index) == 'table' then
           getMembers(t, meta.__index)
         end
+        res.result = table2array(t, req.funcOnly)
       end
-      res.result = table2array(t, req.funcOnly)
     else
       res.error = 'unknown cmd: ' .. logger.tostring(req.cmd)
     end
-    logger:info('reply: %s', res)
+    logger:debug('reply: %s', res)
     utils.write_jsonresponse(sock, res)
   end
-  logger:info('console session ends.')
+  logger:debug('console session ends.')
 end
 
 function start(req, res)
