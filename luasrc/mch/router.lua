@@ -42,7 +42,7 @@ function _map(route_table, route_order, uri, func_name)
     mod = require(mod_name)
     local func = mod[fn]
     if func then
-        route_table[uri] = mod[fn]
+        route_table[uri] = func
         table_insert(route_order, uri)
         -- table_sort(route_order, route_sorter) -- sort when merge!
     else
