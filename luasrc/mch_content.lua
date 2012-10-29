@@ -18,6 +18,8 @@
 --
 --
 
+local string_match = string.match
+
 mch_vars = nil
 mch_debug = nil
 
@@ -95,8 +97,9 @@ function setup_app()
 end
 
 function content()
-    ngx.ctx.MOOCHINE_APP_NAME = ngx.var.MOOCHINE_APP_NAME
-    if (not is_inited(ngx.ctx.MOOCHINE_APP_NAME)) or (not package.loaded["mch.vars"]) then
+    local ngx_ctx = ngx.ctx
+    ngx_ctx.MOOCHINE_APP_NAME = ngx.var.MOOCHINE_APP_NAME
+    if (not is_inited(ngx_ctx.MOOCHINE_APP_NAME)) or (not package.loaded["mch.vars"]) then
         local ok, ret = pcall(setup_app)
         if not ok then
             ngx.status = 500
@@ -104,32 +107,32 @@ function content()
             return
         end
     else
-        mch_vars = require("mch.vars")
+        mch_vars  = require("mch.vars")
         mch_debug = require("mch.debug")
     end
     
-    if not is_inited(ngx.ctx.MOOCHINE_APP_NAME) then
-        ngx.status=501
-        ngx.say('Can not setup MOOCHINE APP ' .. ngx.ctx.MOOCHINE_APP_NAME)
+    if not is_inited(ngx_ctx.MOOCHINE_APP_NAME) then
+        ngx.status = 501
+        ngx.say('Can not setup MOOCHINE APP ' .. ngx_ctx.MOOCHINE_APP_NAME)
         return
     end
     local uri = ngx.var.REQUEST_URI
-    local route_map   = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
-    local route_order = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_ORDER']
+    local route_map   = mch_vars.get(ngx_ctx.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_MAP']
+    local route_order = mch_vars.get(ngx_ctx.MOOCHINE_APP_NAME,"ROUTE_INFO")['ROUTE_ORDER']
     local page_found  = false
     -- match order by definition order
     for _, k in ipairs(route_order) do
-        local args = string.match(uri, k)
+        local args = string_match(uri, k)
         if args then
             page_found = true
             local v = route_map[k]
-            local request  = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
-            local response = mch_vars.get(ngx.ctx.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
+            local request  = mch_vars.get(ngx_ctx.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['request']
+            local response = mch_vars.get(ngx_ctx.MOOCHINE_APP_NAME,'MOOCHINE_MODULES')['response']
 
             local requ = request.Request:new()
             local resp = response.Response:new()
-            ngx.ctx.request  = requ
-            ngx.ctx.response = resp
+            ngx_ctx.request  = requ
+            ngx_ctx.response = resp
             
             if type(v) == "function" then                
                 if mch_debug then mch_debug.debug_clear() end

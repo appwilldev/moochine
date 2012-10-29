@@ -18,10 +18,14 @@
 --
 --
 
-local json = require("cjson")
-local floor = math.floor
-local strchar = string.char
-local strbyte = string.byte
+local json          = require("cjson")
+
+local math_floor    = math.floor
+local string_char   = string.char
+local string_byte   = string.byte
+local string_rep    = string.rep
+local string_sub    = string.sub
+local debug_getinfo = debug.getinfo
 
 local mchvars = require("mch.vars")
 
@@ -80,15 +84,15 @@ end
 function _strify(o, tab, act, logged)
     local v = tostring(o)
     if logged[o] then return v end
-    if string.sub(v,0,6) == "table:" then
+    if string_sub(v,0,6) == "table:" then
         logged[o] = true
-        act = "\n" .. string.rep("|    ",tab) .. "{ [".. tostring(o) .. ", "
+        act = "\n" .. string_rep("|    ",tab) .. "{ [".. tostring(o) .. ", "
         act = act .. table_real_length(o) .." item(s)]"
         for k, v in pairs(o) do
-            act = act .."\n" .. string.rep("|    ", tab)
+            act = act .."\n" .. string_rep("|    ", tab)
             act = act .. "|   *".. k .. "\t=>\t" .. _strify(v, tab+1, act, logged)
         end
-        act = act .. "\n" .. string.rep("|    ",tab) .. "}"
+        act = act .. "\n" .. string_rep("|    ",tab) .. "}"
         return act
     else
         return v
@@ -113,16 +117,16 @@ end
 
 function is_subapp(__call_frame_level)
     if not __call_frame_level then __call_frame_level = 2 end
-    local caller = debug.getinfo(__call_frame_level,'S').source
+    local caller = debug_getinfo(__call_frame_level,'S').source
     local main_app = ngx.var.MOOCHINE_APP_PATH
     
-    local is_mainapp = (main_app == (string.sub(caller, 2, #main_app+1)))
+    local is_mainapp = (main_app == (string_sub(caller, 2, #main_app+1)))
     if is_mainapp then return false, nil end -- main app
     
     local subapps = mchvars.get(ngx.ctx.MOOCHINE_APP_NAME, "APP_CONFIG").subapps or {}
     for k, v in pairs(subapps) do
         local spath = v.path
-        local is_this_subapp = (spath == (string.sub(caller, 2, #spath+1)))
+        local is_this_subapp = (spath == (string_sub(caller, 2, #spath+1)))
         if is_this_subapp then return true, k end -- sub app
     end
     
@@ -130,20 +134,20 @@ function is_subapp(__call_frame_level)
 end
 
 function parseNetInt(bytes)
-    local a, b, c, d = strbyte(bytes, 1, 4)
+    local a, b, c, d = string_byte(bytes, 1, 4)
     return a * 256 ^ 3 + b * 256 ^ 2 + c * 256 + d
 end
 
 function toNetInt(n)
     -- NOTE: for little endian machine only!!!
     local d = n % 256
-    n = floor(n / 256)
+    n = math_floor(n / 256)
     local c = n % 256
-    n = floor(n / 256)
+    n = math_floor(n / 256)
     local b = n % 256
-    n = floor(n / 256)
+    n = math_floor(n / 256)
     local a = n
-    return strchar(a) .. strchar(b) .. strchar(c) .. strchar(d)
+    return string_char(a) .. string_char(b) .. string_char(c) .. string_char(d)
 end
 
 function write_jsonresponse(sock, s)

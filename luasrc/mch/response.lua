@@ -20,17 +20,14 @@
 
 module('mch.response',package.seeall)
 
-local mchutil=require('mch.util')
-local mchvars=require('mch.vars')
-local mchdebug=require("mch.debug")
-local functional=require('mch.functional')
-local ltp=require("ltp.template")
+local mchutil    = require('mch.util')
+local mchvars    = require('mch.vars')
+local mchdebug   = require("mch.debug")
+local functional = require('mch.functional')
+local ltp        = require("ltp.template")
 
 local table_insert = table.insert
 local table_concat = table.concat
-
-local MOOCHINE_APP_PATH = ngx.var.MOOCHINE_APP
-local MOOCHINE_EXTRA_APP_PATH = ngx.var.MOOCHINE_APP_EXTRA
 
 Response={ltp=ltp}
 

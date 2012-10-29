@@ -18,8 +18,9 @@
 --
 --
 
-
 module('mch.functional',package.seeall)
+
+local table_insert = table.insert
 
 --[[
 -- common functional tools
@@ -32,7 +33,7 @@ function curry(func, ...)
     local function inner(...)
         local _args={...}
         local real_args={unpack(args)}
-        for _,v in ipairs(_args) do table.insert(real_args,v) end
+        for _,v in ipairs(_args) do table_insert(real_args,v) end
         return func(unpack(real_args))
     end
     return inner
@@ -45,7 +46,7 @@ function map(func,tab)
         if rk then
             retv[rk]=rv
         else
-            table.insert(retv,rv)
+            table_insert(retv,rv)
         end
     end
     return retv
@@ -83,5 +84,4 @@ end
 table_keys=curry(map,function(k,_)return nil,k end)
 table_values=curry(map,function(_,v)return nil,v end)
 table2array=table_values
-
 

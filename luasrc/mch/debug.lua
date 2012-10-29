@@ -20,19 +20,22 @@
 
 module('mch.debug',package.seeall)
 
-local mchutil=require('mch.util')
-local front=require('mch.front')
-local mchvars=require('mch.vars')
-local functional=require('mch.functional')
+local mchutil    = require('mch.util')
+local front      = require('mch.front')
+local mchvars    = require('mch.vars')
+local functional = require('mch.functional')
+
+local debug_getinfo = debug.getinfo
+local string_format = string.format
 
 function traceback ()
     for level = 1, math.huge do
-        local info = debug.getinfo(level, "Sl")
+        local info = debug_getinfo(level, "Sl")
         if not info then break end
         if info.what == "C" then   -- is a C function?
             print(level, "C function")
         else   -- a Lua function
-            print(string.format("[%s]:%d", info.short_src,
+            print(string_format("[%s]:%d", info.short_src,
                                 info.currentline))
         end
     end
@@ -42,7 +45,7 @@ function debug_utils()
     local debug_info={info={}}
     
     function _debug_hook(event, extra)
-        local info = debug.getinfo(2)
+        local info = debug_getinfo(2)
         if info.currentline<=0 then return end
         --if (string.find(info.short_src,"moochine/luasrc") or 
         --string.find(info.short_src,"moochine/lualib")) then
@@ -81,7 +84,7 @@ function debug_info2html()
         elseif info.event=="return" then
             estr = " <- "
         end
-        local sinfo=(string.format("<li>%s [function %s] in file [%s]:%d,</li>\r\n",
+        local sinfo=(string_format("<li>%s [function %s] in file [%s]:%d,</li>\r\n",
                                    estr,
                                    tostring(info.name),
                                    info.short_src,
@@ -101,7 +104,7 @@ function debug_info2text()
         elseif info.event=="return" then
             estr = " <- "
         end
-        local sinfo=(string.format("%s [function %s] in file [%s]:%d,\n",
+        local sinfo=(string_format("%s [function %s] in file [%s]:%d,\n",
                                    estr,
                                    tostring(info.name),
                                    info.short_src,
@@ -110,6 +113,4 @@ function debug_info2text()
     end
     return ret
 end
-
-
 

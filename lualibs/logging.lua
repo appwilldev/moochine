@@ -14,10 +14,15 @@ local type, table, string, _tostring, tonumber = type, table, string, tostring, 
 local unpack = unpack
 local select = select
 local error = error
-local format = string.format
 local pcall = pcall
 local getmetatable, rawget = getmetatable, rawget
 local ipairs, pairs = ipairs, pairs
+
+local string_format = string.format
+local string_gsub   = string.gsub
+local table_insert  = table.insert
+local table_concat  = table.concat
+local table_sort    = table.sort
 
 module("logging")
 
@@ -56,17 +61,17 @@ function cleverformat(fmt, ...)
   local args = {...}
   local pos = 0
   local newarg = {}
-  local newfmt = string.gsub(fmt, '%%s?', function(spec)
+  local newfmt = string_gsub(fmt, '%%s?', function(spec)
     pos = pos + 1
     if spec == '%s' then
-      return string.gsub(tostring(args[pos]), '%%', '%%%%')
+      return string_gsub(tostring(args[pos]), '%%', '%%%%')
     else
-      table.insert(newarg, args[pos])
+      table_insert(newarg, args[pos])
       return '%'
     end
   end)
   if #newarg > 0 then
-    return format(newfmt, unpack(newarg))
+    return string_format(newfmt, unpack(newarg))
   else
     return newfmt
   end
@@ -108,7 +113,7 @@ local function assert(exp, ...)
 	-- if exp is true, we are finished so don't do any processing of the parameters
 	if exp then return exp, ... end
 	-- assertion failed, raise error
-	error(format(...), 2)
+	error(string_format(...), 2)
 end
 
 -------------------------------------------------------------------------------
@@ -162,15 +167,13 @@ end
 -- Prepares the log message
 -------------------------------------------------------------------------------
 function prepareLogMsg(pattern, dt, level, message)
-
     local logMsg = pattern or "%date %level %message\n"
-    message = string.gsub(message, "%%", "%%%%")
-    logMsg = string.gsub(logMsg, "%%date", dt)
-    logMsg = string.gsub(logMsg, "%%level", level)
-    logMsg = string.gsub(logMsg, "%%message", message)
+    message = string_gsub(message, "%%", "%%%%")
+    logMsg  = string_gsub(logMsg,  "%%date", dt)
+    logMsg  = string_gsub(logMsg,  "%%level", level)
+    logMsg  = string_gsub(logMsg,  "%%message", message)
     return logMsg
 end
-
 
 -------------------------------------------------------------------------------
 -- Converts a Lua value to a string
@@ -195,27 +198,27 @@ function tostring(value, visited)
 
   if type(value) ~= 'table' then
     if type(value) == 'string' then
-      str = format("%q", value)
+      str = string_format("%q", value)
     else
       str = _tostring(value)
     end
   else
     local tmp = {}
     for k, v in ipairs(value) do
-      table.insert(tmp, tostring(v, visited))
+      table_insert(tmp, tostring(v, visited))
     end
-    str = table.concat(tmp, ', ')
+    str = table_concat(tmp, ', ')
     local n = #tmp
 
     tmp = {}
     for k, v in pairs(value) do
       if type(k) ~= 'number' or k < 1 or k > n then
-        table.insert(tmp, tostring(k) .. ' = ' .. tostring(v, visited))
+        table_insert(tmp, tostring(k) .. ' = ' .. tostring(v, visited))
       end
     end
     if #tmp > 0 then
-      table.sort(tmp)
-      local str2 = table.concat(tmp, ', ')
+      table_sort(tmp)
+      local str2 = table_concat(tmp, ', ')
       if #str > 1 then
         str = str .. ', ' .. str2
       else
