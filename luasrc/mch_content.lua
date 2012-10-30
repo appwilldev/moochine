@@ -106,6 +106,7 @@ function content()
             local error_info = "MOOCHINE APP SETUP ERROR: " .. ret
             ngx.status = 500
             ngx.say(error_info)
+            logger:e(error_info)
             ngx.log(ngx.ERR, error_info)
             return
         end
@@ -118,6 +119,7 @@ function content()
         local error_info = 'Can not setup MOOCHINE APP: ' .. ngx_ctx.MOOCHINE_APP_NAME
         ngx.status = 501
         ngx.say(error_info)
+        logger:e(error_info)
         ngx.log(ngx.ERR, error_info)
         return
     end
