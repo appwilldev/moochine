@@ -70,6 +70,7 @@ function get_logger(appname)
                                 message)
         local log_date = string_sub(date, 1, 10)
         if log_date ~= f_date then
+          f_date = log_date
           f:close()
           f = io.open(log_filename(log_date), "a")
           f:setvbuf("line")
