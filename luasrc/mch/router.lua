@@ -25,6 +25,9 @@ require 'mch.functional'
 require 'mch.vars'
 require 'mch.util'
 
+local string_match = string.match
+local table_insert = table.insert
+local table_sort   = table.sort
 
 function route_sorter(luri, ruri)
     if #luri==#ruri then
@@ -35,20 +38,28 @@ function route_sorter(luri, ruri)
 end
 
 function _map(route_table, route_order, uri, func_name)
-    local mod, fn = string.match(func_name, '^(.+)%.([^.]+)$')
-    mod = require(mod)
-    route_table[uri] = mod[fn]
-    table.insert(route_order, uri)
-    -- table.sort(route_order, route_sorter) -- sort when merge!
+    local mod_name, fn = string_match(func_name, '^(.+)%.([^.]+)$')
+    mod = require(mod_name)
+    local func = mod[fn]
+    if func then
+        route_table[uri] = func
+        table_insert(route_order, uri)
+        -- table_sort(route_order, route_sorter) -- sort when merge!
+    else
+        local error_info = "MOOCHINE URL Mapping Error:[" .. uri .. "=>" .. func_name .. "] function or controller not found in module: " .. mod_name
+        logger:error(error_info)
+        ngx.log(ngx.ERR, error_info)
+    end
 end
 
 function map(route_table, route_order, uri, func_name)
     local ret, err = pcall(_map, route_table, route_order, uri, func_name)
     if not ret then
-        logger:error("URL Mapping Error:[" .. uri .. "=>" .. func_name .. "]" .. err)
+        local error_info = "MOOCHINE URL Mapping Error:[" .. uri .. "=>" .. func_name .. "] " .. err
+        logger:error(error_info)
+        ngx.log(ngx.ERR, error_info)
     end
 end
-
 
 function setup()
     local app_name = getfenv(2).__CURRENT_APP_NAME__
@@ -88,8 +99,8 @@ function merge_routings(main_app, subapps)
         local sub_routings=mch.vars.get(expanded_key,"ROUTE_INFO")['ROUTE_MAP']
         for sk,sv in pairs(sub_routings) do main_routings[sk]=sv end
         local sub_routings_order=mch.vars.get(expanded_key,"ROUTE_INFO")['ROUTE_ORDER']
-        for _,sv in ipairs(sub_routings_order) do table.insert(main_routings_order,sv) end
+        for _,sv in ipairs(sub_routings_order) do table_insert(main_routings_order,sv) end
     end
-    table.sort(main_routings_order, route_sorter)
+    table_sort(main_routings_order, route_sorter)
 end
 

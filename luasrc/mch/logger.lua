@@ -21,6 +21,12 @@
 module("mch.logger", package.seeall)
 
 local string_sub = string.sub
+local string_lower  = string.lower
+local string_format = string.format
+local debug_getinfo = debug.getinfo
+local os_date       = os.date
+local ngx_time      = ngx.time
+
 logging = require("logging")
 mchutil = require("mch.util")
 mchvars = require("mch.vars")
@@ -50,14 +56,14 @@ function get_logger(appname)
     local f = io.open(log_filename(f_date), "a")
     if not f then
         f = io.open("/dev/stderr", "a")
-        ngx.log(ngx.ERR, string.format("LOGGER ERROR: file `%s' could not be opened for writing", filename))
+        ngx.log(ngx.ERR, string_format("LOGGER ERROR: file `%s' could not be opened for writing", filename))
     end
     f:setvbuf("line")
 
     local function log_appender(self, level, message)
-        local date = os.date("%Y-%m-%d %H:%M:%S")
-        local frame = debug.getinfo(4)
-        local s = string.format('[%s] [%s] [%s:%d] %s\n',
+        local date = os_date("%Y-%m-%d %H:%M:%S")
+        local frame = debug_getinfo(4)
+        local s = string_format('[%s] [%s] [%s:%d] %s\n',
                                 string_sub(date, 6), level,
                                 frame.short_src,
                                 frame.currentline,
@@ -92,7 +98,7 @@ function get_logger(appname)
         logger[k] = function(self, ...)
                         logger.log(self, l, ...)
                     end
-        logger[string.lower(l)] = logger[k]
+        logger[string_lower(l)] = logger[k]
     end
     logger.tostring = logging.tostring
     logger.table_print = mchutil.table_print

@@ -20,17 +20,15 @@
 
 module('mch.response',package.seeall)
 
-local mchutil=require('mch.util')
-local mchvars=require('mch.vars')
-local mchdebug=require("mch.debug")
-local functional=require('mch.functional')
-local ltp=require("ltp.template")
+local mchutil    = require('mch.util')
+local mchvars    = require('mch.vars')
+local mchdebug   = require("mch.debug")
+local functional = require('mch.functional')
+local ltp        = require("ltp.template")
 
 local table_insert = table.insert
 local table_concat = table.concat
-
-local MOOCHINE_APP_PATH = ngx.var.MOOCHINE_APP
-local MOOCHINE_EXTRA_APP_PATH = ngx.var.MOOCHINE_APP_EXTRA
+local string_match = string.match
 
 Response={ltp=ltp}
 
@@ -81,7 +79,9 @@ end
 
 function Response:write(content)
     if self._eof==true then
-        ngx.log(ngx.ERR, "Moochine WARNING: The response has been explicitly finished before.")
+        local error_info = "Moochine WARNING: The response has been explicitly finished before."
+        logger:warn(error_info)
+        ngx.log(ngx.ERR, error_info)
         return
     end
 
@@ -90,7 +90,9 @@ end
 
 function Response:writeln(content)
     if self._eof==true then
-        ngx.log(ngx.ERR, "Moochine WARNING: The response has been explicitly finished before.")
+        local error_info = "Moochine WARNING: The response has been explicitly finished before."
+        logger:warn(error_info)
+        ngx.log(ngx.ERR, error_info)
         return
     end
 
@@ -134,26 +136,27 @@ function Response:set_cookie(key, value, encrypt, duration, path)
 end
 
 function Response:debug()
-    local debug_conf=mchutil.get_config("debug")
-    local target="ngx.log"
+    local debug_conf = mchutil.get_config("debug")
+    local target = "ngx.log"
     if debug_conf and type(debug_conf)=="table" then target = debug_conf.to or target end
-    if target == "response" and string.match(self.headers['Content-Type'] or '', '^text/.*html') then
+    if target=="response" and string_match(self.headers['Content-Type'] or '', '^text/.*html') then
         -- seems to be no way to get default_type?
         self:write(mchdebug.debug_info2html())
-    elseif target== "ngx.log" then
+    elseif target=="ngx.log" then
         ngx.log(ngx.DEBUG, mchdebug.debug_info2text())
     end
     mchdebug.debug_clear()
 end
 
 function Response:error(info)
-    if self._eof==true then
-        ngx.log(ngx.ERR, "Moochine ERROR:\r\n", info, "\r\n")
-    else
+    local error_info = "Moochine ERROR: " .. info
+    if self._eof==false then
         ngx.status=500
         self.headers['Content-Type'] = 'text/html; charset=utf-8'
-        self:write({"Moochine ERROR:\r\n", info, "\r\n"})
+        self:write(error_info)
     end
+    logger:error(error_info)
+    --ngx.log(ngx.ERR, error_info)
 end
 
 function Response:is_finished()

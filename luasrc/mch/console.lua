@@ -2,6 +2,8 @@ local utils = require("mch.util")
 
 module('mch.console', package.seeall)
 
+local table_insert = table.insert
+
 function getMembers(t, o)
   local tp
   for i, j in pairs(o) do
@@ -21,10 +23,10 @@ function table2array(t, funcOnly)
   local ret = {}
   for k, v in pairs(t) do
     if v then
-      table.insert(ret, k .. '(')
+      table_insert(ret, k .. '(')
     elseif funcOnly then
     else
-      table.insert(ret, k)
+      table_insert(ret, k)
     end
   end
   return ret
