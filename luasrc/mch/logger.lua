@@ -20,6 +20,7 @@
 
 module("mch.logger", package.seeall)
 
+local string_sub = string.sub
 logging = require("logging")
 mchutil = require("mch.util")
 mchvars = require("mch.vars")
@@ -41,7 +42,12 @@ function get_logger(appname)
         level = log_config.level
     end
 
-    local f = io.open(filename, "a")
+    local log_filename = function(date)
+      return filename .. '.' .. date
+    end
+
+    local f_date = os.date("%Y-%m-%d")
+    local f = io.open(log_filename(f_date), "a")
     if not f then
         f = io.open("/dev/stderr", "a")
         ngx.log(ngx.ERR, string.format("LOGGER ERROR: file `%s' could not be opened for writing", filename))
@@ -49,13 +55,19 @@ function get_logger(appname)
     f:setvbuf("line")
 
     local function log_appender(self, level, message)
-        local date = os.date("%m-%d %H:%M:%S")
+        local date = os.date("%Y-%m-%d %H:%M:%S")
         local frame = debug.getinfo(4)
         local s = string.format('[%s] [%s] [%s:%d] %s\n',
-                                date, level,
+                                string_sub(date, 6), level,
                                 frame.short_src,
                                 frame.currentline,
                                 message)
+        local log_date = string_sub(date, 1, 10)
+        if log_date ~= f_date then
+          f:close()
+          f = io.open(log_filename(log_date), "a")
+          f:setvbuf("line")
+        end
         f:write(s)
         return true
     end
