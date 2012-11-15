@@ -24,6 +24,7 @@ local string_sub = string.sub
 local string_lower  = string.lower
 local string_format = string.format
 local debug_getinfo = debug.getinfo
+local io_open       = io.open
 local os_date       = os.date
 local ngx_time      = ngx.time
 
@@ -52,19 +53,20 @@ function get_logger(appname)
       return filename .. '.' .. date
     end
 
-    local f_date = os.date("%Y-%m-%d")
-    local f = io.open(log_filename(f_date), "a")
+    local f_date = os_date("%Y-%m-%d", ngx_time())
+    local f = io_open(log_filename(f_date), "a")
     if not f then
-        f = io.open("/dev/stderr", "a")
+        f = io_open("/dev/stderr", "a")
         ngx.log(ngx.ERR, string_format("LOGGER ERROR: file `%s' could not be opened for writing", filename))
     end
     f:setvbuf("line")
 
     local function log_appender(self, level, message)
-        local date = os_date("%Y-%m-%d %H:%M:%S")
+        local date  = os_date("%Y-%m-%d %H:%M:%S", ngx_time())
         local frame = debug_getinfo(4)
         local s = string_format('[%s] [%s] [%s:%d] %s\n',
-                                string_sub(date, 6), level,
+                                string_sub(date, 6),
+                                level,
                                 frame.short_src,
                                 frame.currentline,
                                 message)
@@ -72,7 +74,7 @@ function get_logger(appname)
         if log_date ~= f_date then
           f_date = log_date
           f:close()
-          f = io.open(log_filename(log_date), "a")
+          f = io_open(log_filename(log_date), "a")
           f:setvbuf("line")
         end
         f:write(s)

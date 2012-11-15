@@ -22,28 +22,30 @@ module('mch.request',package.seeall)
 
 local string_len = string.len
 
-Request={}
+Request = {}
 
 function Request:new()
-    local ret={
-        method=ngx.var.request_method,
-        schema=ngx.var.schema,
-        host=ngx.var.host,
-        hostname=ngx.var.hostname,
-        uri=ngx.var.request_uri,
-        path=ngx.var.uri,
-        filename=ngx.var.request_filename,
-        query_string=ngx.var.query_string,
-        headers=ngx.req.get_headers(),
-        user_agent=ngx.var.http_user_agent,
-        remote_addr=ngx.var.remote_addr,
-        remote_port=ngx.var.remote_port,
-        remote_user=ngx.var.remote_user,
-        remote_passwd=ngx.var.remote_passwd,
-        content_type=ngx.var.content_type,
-        content_length=ngx.var.content_length,
-        uri_args=ngx.req.get_uri_args(),
-        socket=ngx.req.socket
+    local ngx_var = ngx.var
+    local ngx_req = ngx.req
+    local ret = {
+        method          = ngx_var.request_method,
+        schema          = ngx_var.schema,
+        host            = ngx_var.host,
+        hostname        = ngx_var.hostname,
+        uri             = ngx_var.request_uri,
+        path            = ngx_var.uri,
+        filename        = ngx_var.request_filename,
+        query_string    = ngx_var.query_string,
+        headers         = ngx_req.get_headers(),
+        user_agent      = ngx_var.http_user_agent,
+        remote_addr     = ngx_var.remote_addr,
+        remote_port     = ngx_var.remote_port,
+        remote_user     = ngx_var.remote_user,
+        remote_passwd   = ngx_var.remote_passwd,
+        content_type    = ngx_var.content_type,
+        content_length  = ngx_var.content_length,
+        uri_args        = ngx_req.get_uri_args(),
+        socket          = ngx_req.socket
     }
 
     setmetatable(ret,self)
@@ -99,16 +101,17 @@ function Request:get_arg(name, default)
 end
 
 function Request:read_body()
-    ngx.req.read_body()
-    self.post_args=ngx.req.get_post_args()
+    local ngx_req = ngx.req
+    ngx_req.read_body()
+    self.post_args = ngx_req.get_post_args()
 end
 
 function Request:get_cookie(key, decrypt)
     local value = ngx.var['cookie_'..key]
 
     if value and value~="" and decrypt==true then
-        value=ndk.set_var.set_decode_base64(value)
-        value=ndk.set_var.set_decrypt_session(value)
+        value = ndk.set_var.set_decode_base64(value)
+        value = ndk.set_var.set_decrypt_session(value)
     end
 
     return value
