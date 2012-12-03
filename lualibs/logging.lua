@@ -14,15 +14,11 @@ local type, table, string, _tostring, tonumber = type, table, string, tostring, 
 local unpack = unpack
 local select = select
 local error = error
+local format = string.format
 local pcall = pcall
+local print = print
 local getmetatable, rawget = getmetatable, rawget
 local ipairs, pairs = ipairs, pairs
-
-local string_format = string.format
-local string_gsub   = string.gsub
-local table_insert  = table.insert
-local table_concat  = table.concat
-local table_sort    = table.sort
 
 module("logging")
 
@@ -61,17 +57,17 @@ function cleverformat(fmt, ...)
   local args = {...}
   local pos = 0
   local newarg = {}
-  local newfmt = string_gsub(fmt, '%%s?', function(spec)
+  local newfmt = string.gsub(fmt, '%%s?', function(spec)
     pos = pos + 1
     if spec == '%s' then
-      return string_gsub(tostring(args[pos]), '%%', '%%%%')
+      return string.gsub(tostring(args[pos]), '%%', '%%%%')
     else
-      table_insert(newarg, args[pos])
+      table.insert(newarg, args[pos])
       return '%'
     end
   end)
   if #newarg > 0 then
-    return string_format(newfmt, unpack(newarg))
+    return format(newfmt, unpack(newarg))
   else
     return newfmt
   end
@@ -113,7 +109,7 @@ local function assert(exp, ...)
 	-- if exp is true, we are finished so don't do any processing of the parameters
 	if exp then return exp, ... end
 	-- assertion failed, raise error
-	error(string_format(...), 2)
+	error(format(...), 2)
 end
 
 -------------------------------------------------------------------------------
@@ -167,13 +163,15 @@ end
 -- Prepares the log message
 -------------------------------------------------------------------------------
 function prepareLogMsg(pattern, dt, level, message)
+
     local logMsg = pattern or "%date %level %message\n"
-    message = string_gsub(message, "%%", "%%%%")
-    logMsg  = string_gsub(logMsg,  "%%date", dt)
-    logMsg  = string_gsub(logMsg,  "%%level", level)
-    logMsg  = string_gsub(logMsg,  "%%message", message)
+    message = string.gsub(message, "%%", "%%%%")
+    logMsg = string.gsub(logMsg, "%%date", dt)
+    logMsg = string.gsub(logMsg, "%%level", level)
+    logMsg = string.gsub(logMsg, "%%message", message)
     return logMsg
 end
+
 
 -------------------------------------------------------------------------------
 -- Converts a Lua value to a string
@@ -181,44 +179,48 @@ end
 -- Converts Table fields in alphabetical order
 -------------------------------------------------------------------------------
 function tostring(value, visited)
-  self_tostring = rawget(getmetatable(value) or {}, '__tostring')
-  if self_tostring then return self_tostring(value) end
-  local str = ''
-  if visited == nil then
-    if value ~= nil then
-      visited = {
-        [value] = true
-      }
-    end
-  elseif visited[value] then
-    return _tostring(value)
-  else
-    visited[value] = true
+  local meta = getmetatable(value)
+  if type(meta) == 'table' then
+    self_tostring = rawget(meta, '__tostring')
+    if self_tostring then return self_tostring(value) end
   end
+  local str = ''
 
   if type(value) ~= 'table' then
     if type(value) == 'string' then
-      str = string_format("%q", value)
+      str = format("%q", value)
     else
       str = _tostring(value)
     end
   else
+    if visited == nil then
+      if value ~= nil then
+        visited = {
+          [value] = true
+        }
+      end
+    elseif visited[value] then
+      return _tostring(value)
+    else
+      visited[value] = true
+    end
+
     local tmp = {}
     for k, v in ipairs(value) do
-      table_insert(tmp, tostring(v, visited))
+      table.insert(tmp, tostring(v, visited))
     end
-    str = table_concat(tmp, ', ')
+    str = table.concat(tmp, ', ')
     local n = #tmp
 
     tmp = {}
     for k, v in pairs(value) do
       if type(k) ~= 'number' or k < 1 or k > n then
-        table_insert(tmp, tostring(k) .. ' = ' .. tostring(v, visited))
+        table.insert(tmp, tostring(k) .. ' = ' .. tostring(v, visited))
       end
     end
     if #tmp > 0 then
-      table_sort(tmp)
-      local str2 = table_concat(tmp, ', ')
+      table.sort(tmp)
+      local str2 = table.concat(tmp, ', ')
       if #str > 1 then
         str = str .. ', ' .. str2
       else
