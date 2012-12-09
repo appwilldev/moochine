@@ -133,8 +133,8 @@ function content()
 
     -- match order by definition order
     for _, k in ipairs(route_order) do
-        local args = string_match(uri, k)
-        if args then
+        local args = {string_match(uri, k)}
+        if args and #args>0 then
             page_found = true
             local v = route_map[k]
             local request  = mch_vars.get(moochine_app_name, 'MOOCHINE_MODULES')['request']
