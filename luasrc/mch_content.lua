@@ -147,13 +147,13 @@ function content()
 
             if type(v) == "function" then                
                 if mch_debug then mch_debug.debug_clear() end
-                local ok, ret = pcall(v, requ, resp, args)
+                local ok, ret = pcall(v, requ, resp, unpack(args))
                 if not ok then resp:error(ret) end
                 resp:finish()
                 resp:do_defers()
                 resp:do_last_func()
             elseif type(v) == "table" then
-                v:_handler(requ, resp, args)
+                v:_handler(requ, resp, unpack(args))
             else
                 ngx.exit(500)
             end
