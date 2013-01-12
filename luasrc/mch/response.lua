@@ -215,5 +215,6 @@ function Response:ltp(template,data)
     setmetatable(data,mt)
     ltp.execute_template(rfun, data, output)
     self:write(output)
+    return output
 end
 
