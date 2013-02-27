@@ -56,7 +56,7 @@ function map(route_table, route_order, uri, func_name)
     local ret, err = pcall(_map, route_table, route_order, uri, func_name)
     if not ret then
         local error_info = "MOOCHINE URL Mapping Error:[" .. uri .. "=>" .. func_name .. "] " .. err
-        logger:error(error_info)
+        logger:e(error_info)
         ngx.log(ngx.ERR, error_info)
     end
 end
