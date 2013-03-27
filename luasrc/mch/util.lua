@@ -170,7 +170,7 @@ function read_jsonresponse(sock)
         return
     end
     local len = parseNetInt(r)
-    data, err = sock:receive(len)
+    local data, err = sock:receive(len)
     if not data then
         logger:error('Error when receiving from socket: %s', err)
         return
