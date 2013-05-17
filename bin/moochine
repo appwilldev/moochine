@@ -32,9 +32,20 @@ Set $MOOCHINE_HOME first.
 `export MOOCHINE_HOME=/path/to/your/moochine`
 ]==]
 
-AVAILABLE_CMD={"new","help"}
+AVAILABLE_CMD={}
 
-function __FILE__() return debug.getinfo(2,'S').source end
+function ABS_PATH(p) return p end --TODO
+function __FILE__()  return string.sub(debug.getinfo(2, 'S').source, 2) end
+function MCH_HOME()  return string.sub(__FILE__(), 1, -10) .. "/.." end
+
+function register_cmd(name, func) AVAILABLE_CMD[name] = func end
+function check_args(i)
+    for i = 1, i do
+        if not arg[i] then
+            show_help_and_exit('help')
+        end
+    end
+end
 
 function show_help_and_exit(help)
     if string.lower(help) == 'env' then
@@ -45,12 +56,14 @@ function show_help_and_exit(help)
     os.exit()
 end
 
-function new_app(name,path)
-    local mch_home = os.getenv('MOOCHINE_HOME')
-    if not mch_home then
-        show_help_and_exit('env')
+function new_app()
+    check_args(2)
+    local name = arg[2]
+    local path = arg[3] or os.getenv('PWD')
+    if path == '.' then
+        path = os.getenv('PWD')
     end
-
+    local mch_home = MCH_HOME()
     local tmp_path = mch_home .. '/templates/'
     os.execute('cp -r '..tmp_path..' '..path)
 
@@ -66,18 +79,18 @@ function new_app(name,path)
     io.close(wfile)
 end
 
-if arg[1] == 'new' then
-    if not arg[2] then
+register_cmd('new', new_app)
+
+
+function main()
+    local cmd = arg[1]
+    local func = AVAILABLE_CMD[cmd]
+    if func then
+        func()
+    else
         show_help_and_exit('help')
     end
-
-    local name = arg[2]
-    local path = arg[3] or os.getenv('PWD')
-    if path == '.' then
-        path = os.getenv('PWD')
-    end
-    new_app(name, path)
-else
-    show_help_and_exit('help')
 end
 
+--run it
+main()
