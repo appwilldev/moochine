@@ -26,29 +26,58 @@ Usage:
       moochine help                      : show this help
 ]==]
 
-NGINX_CONF = [==[
-        location / {
-            #...
-            default_type text/html;
-            set $MOOCHINE_HOME '__MOOCHINE_HOME__';
-            set $MOOCHINE_APP_NAME  '__MOOCHINE_APP_NAME__'; 
-            set $MOOCHINE_APP_PATH  '__MOOCHINE_APP_PATH__';
-            access_by_lua_file '$MOOCHINE_HOME/luasrc/mch_access.lua';
-            content_by_lua_file '$MOOCHINE_HOME/luasrc/mch_content.lua';
-            #...
-        }
+ENV_INFO = [==[
+Set $MOOCHINE_HOME first.
+
+`export MOOCHINE_HOME=/path/to/your/moochine`
 ]==]
 
 AVAILABLE_CMD={"new","help"}
 
 function __FILE__() return debug.getinfo(2,'S').source end
 
-function show_help_and_exit()
-    print(HELP_INFO)
+function show_help_and_exit(help)
+    if string.lower(help) == 'env' then
+        print(ENV_INFO)
+    else
+        print(HELP_INFO)
+    end
     os.exit()
 end
 
 function new_app(name,path)
+    local mch_home = os.getenv('MOOCHINE_HOME')
+    if not mch_home then
+        show_help_and_exit('env')
+    end
+
+    local tmp_path = mch_home .. '/templates/'
+    os.execute('cp -r '..tmp_path..' '..path)
+
+    local rfile = io.open(tmp_path ..'/conf/nginx.conf', 'r')
+    local wfile = io.open(path ..'/conf/nginx.conf', 'w+')
+    for line in rfile:lines() do
+        if string.gmatch(line, '__MOOCHINE_APP_NAME_VAULE__') then
+            line = string.gsub(line, '__MOOCHINE_APP_NAME_VAULE__', name)
+        end
+        wfile:write(line..'\n')
+    end
+    io.close(rfile)
+    io.close(wfile)
 end
 
-print(HELP_INFO)
+if arg[1] == 'new' then
+    if not arg[2] then
+        show_help_and_exit('help')
+    end
+
+    local name = arg[2]
+    local path = arg[3] or os.getenv('PWD')
+    if path == '.' then
+        path = os.getenv('PWD')
+    end
+    new_app(name, path)
+else
+    show_help_and_exit('help')
+end
+
