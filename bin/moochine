@@ -19,42 +19,36 @@
 --
 
 
-
-HELP_INFO  = [==[
-Usage:
-      moochine new <APP_NAME> <APP_PATH> : create a new moochine app
-      moochine help                      : show this help
-]==]
-
-ENV_INFO = [==[
-Set $MOOCHINE_HOME first.
-
-`export MOOCHINE_HOME=/path/to/your/moochine`
-]==]
-
 AVAILABLE_CMD={}
+DOCS_OF_CMD={}
 
 function ABS_PATH(p) return p end --TODO
 function __FILE__()  return string.sub(debug.getinfo(2, 'S').source, 2) end
 function MCH_HOME()  return string.sub(__FILE__(), 1, -10) .. "/.." end
 
-function register_cmd(name, func) AVAILABLE_CMD[name] = func end
+function register_cmd(name, func, doc)
+    AVAILABLE_CMD[name] = func
+    DOCS_OF_CMD[name] = doc
+end
+
 function check_args(i)
     for i = 1, i do
         if not arg[i] then
-            show_help_and_exit('help')
+            show_help_and_exit()
         end
     end
 end
 
-function show_help_and_exit(help)
-    if string.lower(help) == 'env' then
-        print(ENV_INFO)
-    else
-        print(HELP_INFO)
+function show_help_and_exit()
+    print("Usage:")
+    for cmd, info in pairs(DOCS_OF_CMD) do
+        print("\tmoochine " .. cmd .. " " .. info)
     end
     os.exit()
 end
+
+register_cmd('help', show_help_and_exit,
+             ': show this help')
 
 function new_app()
     check_args(2)
@@ -79,7 +73,8 @@ function new_app()
     io.close(wfile)
 end
 
-register_cmd('new', new_app)
+register_cmd('new', new_app,
+             '<APP_NAME> <APP_PATH> : create a new moochine app')
 
 
 function main()
@@ -88,7 +83,7 @@ function main()
     if func then
         func()
     else
-        show_help_and_exit('help')
+        show_help_and_exit()
     end
 end
 
