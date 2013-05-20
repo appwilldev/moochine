@@ -91,7 +91,7 @@ function new_app()
 
     local mch_home = MCH_HOME()
 
-    local tmp_path = mch_home .. '/templates' -- bug if path exists
+    local tmp_path = mch_home .. '/zygote' -- bug if path exists
     os.execute('cp -ri '..tmp_path..' '..path)
 
     local wfile = io.open(path ..'/bin/mch-vars.sh', 'w+')
