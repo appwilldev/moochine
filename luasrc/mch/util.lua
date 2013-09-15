@@ -43,7 +43,7 @@ end
 
 function setup_app_env(mch_home, app_name, app_path, global)
     global['MOOCHINE_HOME']=mch_home
-    global['MOOCHINE_APP']=appname
+    global['MOOCHINE_APP']=app_name
     global['MOOCHINE_APP_PATH']=app_path
     package.path = mch_home .. '/lualibs/?.lua;' .. package.path
     package.path = app_path .. '/app/?.lua;' .. package.path
