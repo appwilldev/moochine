@@ -27,6 +27,7 @@ local debug_getinfo = debug.getinfo
 local io_open       = io.open
 local os_date       = os.date
 local ngx_time      = ngx.time
+local string_upper  = string.upper
 
 logging = require("logging")
 mchutil = require("mch.util")
@@ -46,7 +47,11 @@ function get_logger(appname)
     end
     
     if log_config and type(log_config.level) == "string" then
-        level = log_config.level
+        local tmp = string_upper(log_config.level)
+        if not logging.LEVELS[tmp] then
+            tmp = 'DEBUG'
+        end
+        level = tmp
     end
 
     local log_filename = function(date)

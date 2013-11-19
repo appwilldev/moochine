@@ -46,11 +46,13 @@ ERROR = "ERROR"
 -- lead the application to abort
 FATAL = "FATAL"
 
-local LEVEL = {"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
+local LEVEL = {"DEBUG", "INFO", "WARN", "ERROR", "FATAL" }
+LEVELS = {}
 local MAX_LEVELS = #LEVEL
 -- make level names to order
 for i=1,MAX_LEVELS do
 	LEVEL[LEVEL[i]] = i
+    LEVELS[LEVEL[i]] = i
 end
 
 function cleverformat(fmt, ...)
