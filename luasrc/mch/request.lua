@@ -97,7 +97,7 @@ function Request:get_post_arg(name, default)
 end
 
 function Request:get_arg(name, default)
-    return self:get_post_arg(name, default) or self:get_uri_arg(name, default)
+    return self:get_post_arg(name) or self:get_uri_arg(name, default)
 end
 
 function Request:read_body()
